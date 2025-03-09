@@ -1,0 +1,24 @@
+{
+  "name": "byte-meets-word-backend",
+  "version": "1.0.0",
+  "description": "Backend repository for Byte-Meets-Word website",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RiyaBhandari-2811/Byte-Meets-Word-Backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/RiyaBhandari-2811/Byte-Meets-Word-Backend/issues"
+  },
+  "homepage": "https://github.com/RiyaBhandari-2811/Byte-Meets-Word-Backend#readme",
+  "devDependencies": {
+    "@vercel/node": "^5.1.12"
+  }
+}
