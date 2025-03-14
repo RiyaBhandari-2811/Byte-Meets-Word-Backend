@@ -20,5 +20,8 @@
   "homepage": "https://github.com/RiyaBhandari-2811/Byte-Meets-Word-Backend#readme",
   "devDependencies": {
     "@vercel/node": "^5.1.12"
+  },
+  "dependencies": {
+    "mongodb": "^6.14.2"
   }
 }
