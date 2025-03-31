@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/RiyaBhandari-2811/Byte-Meets-Word-Backend#readme",
   "devDependencies": {
-    "@vercel/node": "^5.1.12"
+    "@vercel/node": "^5.1.14"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.96",

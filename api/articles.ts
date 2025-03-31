@@ -1,11 +1,13 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { articlesController } from "../controllers/articlesController";
+import { articlesController } from "../controllers/articlesController.ts";
+import connectDB from "../utils/mongodb.ts";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;
   const { id, categoryId, tagId } = query;
 
   try {
+    await connectDB();
     switch (method) {
       case "POST":
         await articlesController.create(req, res);
@@ -18,7 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         } else if (tagId) {
           await articlesController.getByTag(req, res, tagId);
         } else {
-          await articlesController.getAll(req, res, query);
+          await articlesController.getAll(req, res);
         }
         break;
       case "PUT":
@@ -32,6 +34,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(405).json({ error: `Method ${method} not allowed` });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: (error as any).message });
   }
 }
