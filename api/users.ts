@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import connectToDatabase from "../lib/mongodb";
+import connectToDatabase from "../utils/mongodb";
 import { Db } from "mongodb";
 
 const handler = async (req: VercelRequest, res: VercelResponse) => {
@@ -7,10 +7,10 @@ const handler = async (req: VercelRequest, res: VercelResponse) => {
     console.log("GET");
     const db: Db | void = await connectToDatabase();
     console.log("DB", db);
-    
+
     const collection = (db as Db).collection("byte_meets_word_collection");
     console.log("Collection", collection);
-    
+
     const users: any = await collection.find({}).toArray();
 
     res.status(200).json({ users });
