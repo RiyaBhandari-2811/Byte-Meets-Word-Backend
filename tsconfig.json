@@ -4,7 +4,10 @@
       "rootDir": "./",
       "strict": true,
       "module": "NodeNext",
-      "target": "ES6"
+      "target": "ES2022",
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true
     },
     "include": ["api/**/*.ts", "controllers/**/*.ts", "middlewares/**/*.ts", "models/**/*.ts", "utils/**/*.ts"],
     "exclude": ["dist", "node_modules"]
