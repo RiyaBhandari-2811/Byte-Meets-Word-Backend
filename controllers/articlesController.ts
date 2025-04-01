@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import Article from "../models/Article.ts";
+import Article from "../models/Article";
 
 export const articlesController = {
   create: async (req: VercelRequest, res: VercelResponse) => {

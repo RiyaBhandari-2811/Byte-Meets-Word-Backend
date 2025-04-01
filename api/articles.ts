@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { articlesController } from "../controllers/articlesController.ts";
-import connectDB from "../utils/mongodb.ts";
+import { articlesController } from "../controllers/articlesController";
+import connectDB from "../utils/mongodb";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;

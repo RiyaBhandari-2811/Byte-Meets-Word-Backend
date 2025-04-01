@@ -16,3 +16,5 @@ const TagSchema: Schema<ITag> = new mongoose.Schema(
 );
 
 const Tag: Model<ITag> = mongoose.model("Tag", TagSchema);
+
+export default Tag;
