@@ -2,7 +2,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import Tag from "../../models/Tag";
 
 const tagsController = {
-  create: async (req: VercelRequest, res: VercelResponse) => {
+  createTags: async (req: VercelRequest, res: VercelResponse) => {
     try {
       const { tagsName } = req.body;
 
@@ -14,7 +14,7 @@ const tagsController = {
         }
         return res
           .status(201)
-          .json({ message: "Tags added successfully", tagsName });
+          .json({ message: "Tags created successfully", tags: tagsName });
       }
 
       // Handle single insert (single string)
@@ -23,7 +23,7 @@ const tagsController = {
         const savedTag = await Tag.create({ name: tagsName });
         return res
           .status(201)
-          .json({ message: "Tag created successfully", tag: savedTag });
+          .json({ message: "Tag created successfully", tag: tagsName });
       }
 
       // Invalid request body format
@@ -41,7 +41,7 @@ const tagsController = {
       });
     }
   },
-  getAll: async (req: VercelRequest, res: VercelResponse) => {
+  getAllTags: async (req: VercelRequest, res: VercelResponse) => {
     try {
       console.log("Fetching all tags...");
       const tags = await Tag.find({});
@@ -50,8 +50,59 @@ const tagsController = {
     } catch (error) {
       console.error("Error fetching tags:", error);
       res.status(500).json({
-      message: "Internal server error",
-      error: (error as any).message,
+        message: "Internal server error",
+        error: (error as any).message,
+      });
+    }
+  },
+  updateTagById: async (
+    req: VercelRequest,
+    res: VercelResponse,
+    tagId: string
+  ) => {
+    try {
+      const { tagName } = req.body;
+      console.log("Updating tag with ID:", tagId, "to name:", tagName);
+      const updatedTag = await Tag.findByIdAndUpdate(
+        tagId,
+        { name: tagName },
+        { new: true }
+      );
+      if (!updatedTag) {
+        return res.status(404).json({ message: "Tag not found" });
+      }
+      res.status(200).json({
+        message: "Tag updated successfully",
+        tag: updatedTag,
+      });
+    } catch (error) {
+      console.error("Error updating tag:", error);
+      res.status(500).json({
+        message: "Internal server error",
+        error: (error as any).message,
+      });
+    }
+  },
+  deleteTagById: async (
+    req: VercelRequest,
+    res: VercelResponse,
+    tagId: string
+  ) => {
+    try {
+      console.log("Deleting tag with ID:", tagId);
+      const deletedTag = await Tag.findByIdAndDelete(tagId);
+      if (!deletedTag) {
+        return res.status(404).json({ message: "Tag not found" });
+      }
+      res.status(200).json({
+        message: "Tag deleted successfully",
+        tag: deletedTag,
+      });
+    } catch (error) {
+      console.error("Error updating tag:", error);
+      res.status(500).json({
+        message: "Internal server error",
+        error: (error as any).message,
       });
     }
   },
