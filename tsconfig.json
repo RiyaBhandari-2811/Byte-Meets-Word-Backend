@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist",
+      "rootDir": "./",
+      "strict": true,
+      "module": "NodeNext",
+      "target": "ES6"
+    },
+    "include": ["api/**/*.ts", "controllers/**/*.ts", "middlewares/**/*.ts", "models/**/*.ts", "utils/**/*.ts"],
+    "exclude": ["dist", "node_modules"]
+  }
+  
