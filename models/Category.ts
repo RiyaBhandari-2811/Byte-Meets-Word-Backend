@@ -21,3 +21,5 @@ const Category: Model<ICategory> = mongoose.model<ICategory>(
   "Category",
   CategorySchema
 );
+
+export default Category;
