@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import categoriesController from "../controllers/categories/categoriesController";
-import connectDB from "../utils/mongodb";
+import categoriesController from "../../controllers/categories/categoriesController";
+import connectDB from "../../utils/mongodb";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;
@@ -9,12 +9,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await connectDB();
     switch (method) {
-      case "POST":
-        await categoriesController.createCategories(req, res);
-        break;
-      case "GET":
-        await categoriesController.getAllCategories(req, res);
-        break;
       case "PATCH":
         await categoriesController.updateCategoryById(
           req,
