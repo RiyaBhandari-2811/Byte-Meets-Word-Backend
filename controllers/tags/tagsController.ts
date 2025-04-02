@@ -23,7 +23,7 @@ const tagsController = {
         const savedTag = await Tag.create({ name: tagsName });
         return res
           .status(201)
-          .json({ message: "Tag created successfully", tag: tagsName });
+          .json({ message: "Tag created successfully", tag: savedTag });
       }
 
       // Invalid request body format
