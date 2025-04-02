@@ -1,25 +1,33 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import tagsController from "../controllers/tags/tagsController";
+import categoriesController from "../controllers/categories/categoriesController";
 import connectDB from "../utils/mongodb";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;
-  const { tagId } = query;
+  const { categoryId } = query;
 
   try {
     await connectDB();
     switch (method) {
       case "POST":
-        await tagsController.createTags(req, res);
+        await categoriesController.createCategories(req, res);
         break;
       case "GET":
-        await tagsController.getAllTags(req, res);
+        await categoriesController.getAllCategories(req, res);
         break;
       case "PATCH":
-        await tagsController.updateTagById(req, res, tagId as string);
+        await categoriesController.updateCategoryById(
+          req,
+          res,
+          categoryId as string
+        );
         break;
       case "DELETE":
-        await tagsController.deleteTagById(req, res, tagId as string);
+        await categoriesController.deleteCategoryById(
+          req,
+          res,
+          categoryId as string
+        );
         break;
     }
   } catch (error) {
