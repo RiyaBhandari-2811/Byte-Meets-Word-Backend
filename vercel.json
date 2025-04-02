@@ -1,8 +1,0 @@
-{
-    "routes": [
-        {
-            "src": "/users",
-            "dest": "/api/users.ts"
-        }
-    ]
-}
