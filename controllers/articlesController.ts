@@ -130,6 +130,7 @@ export const articlesController = {
     tagId: string | string[]
   ) => {
     try {
+      const tagName = await Tag.findById(tagId).select("name");
       const articles = await Article.find({ tags: tagId })
         .select("_id title summary featureImage readTime createdAt")
         .lean(); // Use .lean() for better performance if you don't need Mongoose documents
@@ -146,6 +147,7 @@ export const articlesController = {
 
       res.json({
         message: "Articles fetched successfully",
+        tagName: tagName?.name,
         articles: formattedArticles,
       });
     } catch (error) {
