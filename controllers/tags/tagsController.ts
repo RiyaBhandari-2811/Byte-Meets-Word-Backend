@@ -8,7 +8,7 @@ const tagsController = {
 
       // Handle bulk insert (array of strings)
       if (Array.isArray(tagsName)) {
-        console.log("Creating bulk tags with data:", tagsName);
+        console.log("Creating bulk tags");
         for (const name of tagsName) {
           await Tag.create({ name });
         }
@@ -43,14 +43,41 @@ const tagsController = {
   },
   getAllTags: async (req: VercelRequest, res: VercelResponse) => {
     try {
-      console.log("Fetching all tags...");
-      const tags = await Tag.find({});
-      console.log("Fetched tags successfully");
-      res.status(200).json(tags);
+      const page: number = req.query.page
+        ? Number(req.query.page as string)
+        : 0;
+
+      const limit: number = req.query.limit
+        ? Number(req.query.limit as string)
+        : 30;
+
+      let tags, total, totalPages;
+
+      if (page) {
+        const skip: number = (page - 1) * limit;
+
+        [tags, total] = await Promise.all([
+          await Tag.find({}).lean().skip(skip).limit(limit),
+          Tag.countDocuments(),
+        ]);
+        totalPages = Math.ceil(total / limit);
+      } else {
+        // Full dataset response
+        tags = await Tag.find({});
+        total = tags.length;
+        totalPages = 1;
+      }
+
+      res.status(200).json({
+        tags,
+        total,
+        page: page || "all",
+        totalPages,
+      });
     } catch (error) {
       console.error("Error fetching tags:", error);
       res.status(500).json({
-        message: "Internal server error",
+        message: "Failed to fetch tags",
         error: (error as any).message,
       });
     }

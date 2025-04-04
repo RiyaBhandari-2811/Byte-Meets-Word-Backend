@@ -160,10 +160,31 @@ export const articlesController = {
   },
   getAll: async (req: VercelRequest, res: VercelResponse) => {
     try {
-      const articles = await Article.find({});
+      const page = req.query.page ? Number(req.query.page as string) : 0;
+      const limit = req.query.limit ? Number(req.query.limit as string) : 6;
+  
+      let articles, total, totalPages;
+  
+      if (page) {
+        const skip = (page - 1) * limit;
+        [articles, total] = await Promise.all([
+          Article.find({}).skip(skip).limit(limit),
+          Article.countDocuments(),
+        ]);
+        totalPages = Math.ceil(total / limit);
+      } else {
+        // Full dataset response
+        articles = await Article.find({});
+        total = articles.length;
+        totalPages = 1; 
+      }
+  
       res.status(200).json({
-        message: "All articles fetched successfully",
+        message: "Articles fetched successfully",
         articles,
+        total,
+        page: page || "all",
+        totalPages,
       });
     } catch (error) {
       console.error("Error fetching articles:", error);
