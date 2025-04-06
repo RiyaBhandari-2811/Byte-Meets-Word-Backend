@@ -2,6 +2,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 
 export interface IArticle extends Document {
   title: string;
+  subtitle: string;
   summary: string;
   featureImage: string;
   mainContent: string;
@@ -16,6 +17,7 @@ export interface IArticle extends Document {
 const ArticleSchema: Schema<IArticle> = new Schema(
   {
     title: { type: String, required: true },
+    subtitle: { type: String },
     summary: { type: String, required: true },
     featureImage: { type: String, required: true },
     mainContent: { type: String, required: true },

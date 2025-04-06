@@ -80,10 +80,7 @@ export const articlesController = {
           message: "Article not found",
         });
       }
-      res.status(200).json({
-        message: "Article fetched successfully",
-        article,
-      });
+      res.status(200).json(article);
     } catch (error) {
       console.error("Error fetching article by ID:", error);
       res.status(500).json({
@@ -130,28 +127,49 @@ export const articlesController = {
     tagId: string | string[]
   ) => {
     try {
-      const tagName = await Tag.findById(tagId).select("name");
-      const articles = await Article.find({ tags: tagId })
-        .select("_id title summary featureImage readTime createdAt")
-        .lean(); // Use .lean() for better performance if you don't need Mongoose documents
+      const page = req.query.page ? Number(req.query.page as string) : 0;
+      const limit = req.query.limit ? Number(req.query.limit as string) : 6;
 
-      // Transform the _id field to id
-      const formattedArticles = articles.map((article) => ({
-        id: article._id,
-        title: article.title,
-        summary: article.summary,
-        featureImage: article.featureImage,
-        readTime: article.readTime || null, // Ensure readTime is included, even if null
-        createdAt: article.createdAt,
-      }));
+      // First verify if tag exists
+      const tag = await Tag.findById(tagId);
+      if (!tag) {
+        return res.status(404).json({
+          message: "Tag not found",
+          tagId,
+        });
+      }
 
-      res.json({
-        message: "Articles fetched successfully",
-        tagName: tagName?.name,
-        articles: formattedArticles,
+      let articles, total, totalPages;
+
+      if (page) {
+        const skip = (page - 1) * limit;
+        [articles, total] = await Promise.all([
+          Article.find({ tags: tagId })
+            .select("_id title summary featureImage readTime createdAt")
+            .lean()
+            .skip(skip)
+            .limit(limit),
+          Article.countDocuments({ tags: tagId }),
+        ]);
+        totalPages = Math.ceil(total / limit);
+      } else {
+        // Full dataset response
+        articles = await Article.find({ tags: tagId })
+          .select("_id title summary featureImage readTime createdAt")
+          .lean();
+        total = articles.length;
+        totalPages = 1;
+      }
+
+      res.status(200).json({
+        tagName: tag.name,
+        articles,
+        total,
+        page: page || "all",
+        totalPages,
       });
     } catch (error) {
-      console.error("Error fetching articles by category:", error);
+      console.error("Error fetching articles by tag:", error);
       res.status(500).json({
         message: "Failed to fetch articles",
         error: (error as any).message,
@@ -162,9 +180,9 @@ export const articlesController = {
     try {
       const page = req.query.page ? Number(req.query.page as string) : 0;
       const limit = req.query.limit ? Number(req.query.limit as string) : 6;
-  
+
       let articles, total, totalPages;
-  
+
       if (page) {
         const skip = (page - 1) * limit;
         [articles, total] = await Promise.all([
@@ -176,11 +194,10 @@ export const articlesController = {
         // Full dataset response
         articles = await Article.find({});
         total = articles.length;
-        totalPages = 1; 
+        totalPages = 1;
       }
-  
+
       res.status(200).json({
-        message: "Articles fetched successfully",
         articles,
         total,
         page: page || "all",
