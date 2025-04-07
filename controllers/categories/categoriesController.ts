@@ -21,10 +21,7 @@ const categoriesController = {
       // Handle single insert (single string)
       else if (typeof category === "object") {
         console.log("Creating single category with data:", category);
-        const savedCategory = await Category.create({
-          name: category.name,
-          isActive: category.isActive,
-        });
+        const savedCategory = await Category.create(category);
         return res.status(201).json({
           message: "Category created successfully",
           category: savedCategory,
@@ -69,7 +66,7 @@ const categoriesController = {
 
       const updatedCategory = await Category.findByIdAndUpdate(
         categoryId,
-        { name: category.name, isActive: category.isActive },
+        { ...category },
         { new: true }
       );
       if (!updatedCategory) {
