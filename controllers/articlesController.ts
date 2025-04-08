@@ -95,13 +95,14 @@ export const articlesController = {
     categoryId: string | string[]
   ) => {
     try {
+      const categoryName = await Category.findById(categoryId).select("name");
       const articles = await Article.find({ category: categoryId })
         .select("_id title summary featureImage readTime createdAt")
         .lean(); // Use .lean() for better performance if you don't need Mongoose documents
 
       // Transform the _id field to id
       const formattedArticles = articles.map((article) => ({
-        id: article._id,
+        _id: article._id,
         title: article.title,
         summary: article.summary,
         featureImage: article.featureImage,
@@ -111,6 +112,7 @@ export const articlesController = {
 
       res.json({
         message: "Articles fetched successfully",
+        categoryName,
         articles: formattedArticles,
       });
     } catch (error) {
