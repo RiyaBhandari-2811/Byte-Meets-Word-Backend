@@ -95,13 +95,41 @@ export const articlesController = {
     categoryId: string | string[]
   ) => {
     try {
-      const articles = await Article.find({ category: categoryId })
-        .select("_id title summary featureImage readTime createdAt")
-        .lean(); // Use .lean() for better performance if you don't need Mongoose documents
+      const page = req.query.page ? Number(req.query.page as string) : 0;
+      const limit = req.query.limit ? Number(req.query.limit as string) : 6;
+
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        return res.status(404).json({
+          message: "Category not found",
+          categoryId,
+        });
+      }
+
+      let articles, total, totalPages;
+
+      if (page) {
+        const skip = (page - 1) * limit;
+        [articles, total] = await Promise.all([
+          Article.find({ category: categoryId })
+            .select("_id title summary featureImage readTime createdAt")
+            .lean()
+            .skip(skip)
+            .limit(limit),
+          Article.countDocuments({ category: categoryId }),
+        ]);
+        totalPages = Math.ceil(total / limit);
+      } else {
+        articles = await Article.find({ category: categoryId })
+          .select("_id title summary featureImage readTime createdAt")
+          .lean();
+        total = articles.length;
+        totalPages = 1;
+      }
 
       // Transform the _id field to id
       const formattedArticles = articles.map((article) => ({
-        id: article._id,
+        _id: article._id,
         title: article.title,
         summary: article.summary,
         featureImage: article.featureImage,
@@ -111,7 +139,11 @@ export const articlesController = {
 
       res.json({
         message: "Articles fetched successfully",
+        categoryName: category.name,
         articles: formattedArticles,
+        total,
+        page: page || "all",
+        totalPages,
       });
     } catch (error) {
       console.error("Error fetching articles by category:", error);
