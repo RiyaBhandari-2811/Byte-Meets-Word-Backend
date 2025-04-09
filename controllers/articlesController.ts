@@ -1,13 +1,14 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import Article, { IArticle } from "../models/Article";
+import Article from "../models/Article";
 import Category from "../models/Category";
 import Tag from "../models/Tag";
+import { IArticleDetail } from "../types/article";
 
 export const articlesController = {
   create: async (req: VercelRequest, res: VercelResponse) => {
     try {
       console.log("Creating article with data:", req.body);
-      const payload: IArticle = req.body as IArticle;
+      const payload: IArticleDetail = req.body as IArticleDetail;
 
       console.log("Finding category ID for category:", payload.category);
       const category: any = await Category.findOne({ name: payload.category });
@@ -131,9 +132,9 @@ export const articlesController = {
       const formattedArticles = articles.map((article) => ({
         _id: article._id,
         title: article.title,
-        summary: article.summary,
+        description: article.description,
         featureImage: article.featureImage,
-        readTime: article.readTime || null, // Ensure readTime is included, even if null
+        readTime: article.readTime,
         createdAt: article.createdAt,
       }));
 
