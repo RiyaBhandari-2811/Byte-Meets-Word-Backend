@@ -21,3 +21,11 @@ export interface IArticleDetail {
   createdAt: Date;
   modifiedAt: Date;
 }
+
+export interface IGetArticlesResponse {
+  name: string;
+  articles: IArticle[];
+  total: number;
+  page: number | string;
+  totalPages: number;
+}

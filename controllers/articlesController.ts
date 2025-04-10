@@ -139,8 +139,7 @@ export const articlesController = {
       }));
 
       res.json({
-        message: "Articles fetched successfully",
-        categoryName: category.name,
+        name: category.name,
         articles: formattedArticles,
         total,
         page: page || "all",
@@ -195,7 +194,7 @@ export const articlesController = {
       }
 
       res.status(200).json({
-        tagName: tag.name,
+        name: tag.name,
         articles,
         total,
         page: page || "all",
@@ -231,6 +230,7 @@ export const articlesController = {
       }
 
       res.status(200).json({
+        name: "Articles",
         articles,
         total,
         page: page || "all",
