@@ -1,24 +1,11 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
+import { IArticleDetail } from "../types/article";
 
-export interface IArticle extends Document {
-  title: string;
-  subtitle: string;
-  summary: string;
-  featureImage: string;
-  mainContent: string;
-  readTime: number;
-  category?: mongoose.Types.ObjectId | null;
-  tags: string[];
-  isActive: boolean;
-  createdAt: Date;
-  modifiedAt: Date;
-}
-
-const ArticleSchema: Schema<IArticle> = new Schema(
+const ArticleSchema: Schema<IArticleDetail> = new Schema(
   {
     title: { type: String, required: true },
     subtitle: { type: String },
-    summary: { type: String, required: true },
+    description: { type: String, required: true },
     featureImage: { type: String, required: true },
     mainContent: { type: String, required: true },
     readTime: { type: Number, required: true },
@@ -31,7 +18,7 @@ const ArticleSchema: Schema<IArticle> = new Schema(
   }
 );
 
-const Article: Model<IArticle> = mongoose.model<IArticle>(
+const Article: Model<IArticleDetail> = mongoose.model<IArticleDetail>(
   "Article",
   ArticleSchema
 );

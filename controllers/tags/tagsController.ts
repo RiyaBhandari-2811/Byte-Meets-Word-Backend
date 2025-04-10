@@ -57,7 +57,7 @@ const tagsController = {
         const skip: number = (page - 1) * limit;
 
         [tags, total] = await Promise.all([
-          await Tag.find({}).lean().skip(skip).limit(limit),
+          await Tag.find({}).select("_id name").lean().skip(skip).limit(limit),
           Tag.countDocuments(),
         ]);
         totalPages = Math.ceil(total / limit);
