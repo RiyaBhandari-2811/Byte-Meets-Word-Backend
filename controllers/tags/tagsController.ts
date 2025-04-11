@@ -1,87 +1,99 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import Tag from "../../models/Tag";
+import { ITag, IGetTagsResponse } from "../../types/tag";
 
 const tagsController = {
   createTags: async (req: VercelRequest, res: VercelResponse) => {
     try {
       const { tagsName } = req.body;
 
-      // Handle bulk insert (array of strings)
+      // Bulk create
       if (Array.isArray(tagsName)) {
         console.log("Creating bulk tags");
-        for (const name of tagsName) {
-          await Tag.create({ name });
-        }
-        return res
-          .status(201)
-          .json({ message: "Tags created successfully", tags: tagsName });
-      }
-
-      // Handle single insert (single string)
-      else if (typeof tagsName === "string") {
-        console.log("Creating single tag with data:", tagsName);
-        const savedTag = await Tag.create({ name: tagsName });
-        return res
-          .status(201)
-          .json({ message: "Tag created successfully", tag: savedTag });
-      }
-
-      // Invalid request body format
-      else {
-        return res.status(400).json({
-          message:
-            "Invalid request format. Provide either 'name' (string) or 'tagNames' (array of strings).",
+        const created = await Tag.insertMany(
+          tagsName.map((name: string) => ({ name }))
+        );
+        return res.status(201).json({
+          message: "Tags created successfully",
+          tags: created,
         });
       }
+
+      // Single create
+      if (typeof tagsName === "string") {
+        console.log("Creating single tag with data:", tagsName);
+        const savedTag = await Tag.create({ name: tagsName });
+        return res.status(201).json({
+          message: "Tag created successfully",
+          tag: savedTag,
+        });
+      }
+
+      // Invalid format
+      return res.status(400).json({
+        message:
+          "Invalid request format. Provide either 'tagsName' as a string or an array of strings.",
+      });
     } catch (error) {
       console.error("Error creating tag:", error);
       res.status(500).json({
         message: "Internal server error",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   getAllTags: async (req: VercelRequest, res: VercelResponse) => {
     try {
-      const page: number = req.query.page
-        ? Number(req.query.page as string)
-        : 0;
+      const page = req.query.page ? Number(req.query.page) : 0;
+      const limit = req.query.limit ? Number(req.query.limit) : 30;
 
-      const limit: number = req.query.limit
-        ? Number(req.query.limit as string)
-        : 30;
+      let tags: ITag[];
+      let total: number;
+      let totalPages: number;
 
-      let tags, total, totalPages;
+      if (page > 0) {
+        const skip = (page - 1) * limit;
 
-      if (page) {
-        const skip: number = (page - 1) * limit;
-
-        [tags, total] = await Promise.all([
-          await Tag.find({}).select("_id name").lean().skip(skip).limit(limit),
+        const [fetchedTags, count] = await Promise.all([
+          (
+            await Tag.find({}).select("_id name").lean().skip(skip).limit(limit)
+          ).map((tag) => ({
+            _id: tag._id.toString(),
+            name: tag.name,
+          })) as ITag[],
           Tag.countDocuments(),
         ]);
+
+        tags = fetchedTags;
+        total = count;
         totalPages = Math.ceil(total / limit);
       } else {
-        // Full dataset response
-        tags = await Tag.find({});
+        tags = (await Tag.find({}).select("_id name").lean()).map((tag) => ({
+          _id: tag._id.toString(),
+          name: tag.name,
+        })) as ITag[];
         total = tags.length;
         totalPages = 1;
       }
 
-      res.status(200).json({
+      const response: IGetTagsResponse = {
         tags,
         total,
         page: page || "all",
         totalPages,
-      });
+      };
+
+      res.status(200).json(response);
     } catch (error) {
       console.error("Error fetching tags:", error);
       res.status(500).json({
         message: "Failed to fetch tags",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   updateTagById: async (
     req: VercelRequest,
     res: VercelResponse,
@@ -90,14 +102,17 @@ const tagsController = {
     try {
       const { tagName } = req.body;
       console.log("Updating tag with ID:", tagId, "to name:", tagName);
+
       const updatedTag = await Tag.findByIdAndUpdate(
         tagId,
         { name: tagName },
         { new: true }
       );
+
       if (!updatedTag) {
         return res.status(404).json({ message: "Tag not found" });
       }
+
       res.status(200).json({
         message: "Tag updated successfully",
         tag: updatedTag,
@@ -106,10 +121,11 @@ const tagsController = {
       console.error("Error updating tag:", error);
       res.status(500).json({
         message: "Internal server error",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   deleteTagById: async (
     req: VercelRequest,
     res: VercelResponse,
@@ -118,20 +134,23 @@ const tagsController = {
     try {
       console.log("Deleting tag with ID:", tagId);
       const deletedTag = await Tag.findByIdAndDelete(tagId);
+
       if (!deletedTag) {
         return res.status(404).json({ message: "Tag not found" });
       }
+
       res.status(200).json({
         message: "Tag deleted successfully",
         tag: deletedTag,
       });
     } catch (error) {
-      console.error("Error updating tag:", error);
+      console.error("Error deleting tag:", error);
       res.status(500).json({
         message: "Internal server error",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
 };
+
 export default tagsController;

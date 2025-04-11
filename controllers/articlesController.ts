@@ -73,9 +73,7 @@ export const articlesController = {
   ) => {
     try {
       const articleId = id as string;
-      const article = await Article.findById(articleId)
-        .populate("category")
-        .populate("tags");
+      const article = await Article.findById(articleId);
       if (!article) {
         return res.status(404).json({
           message: "Article not found",
