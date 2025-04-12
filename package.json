@@ -18,11 +18,13 @@
   },
   "homepage": "https://github.com/RiyaBhandari-2811/Byte-Meets-Word-Backend#readme",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/mongoose": "^5.11.96",
     "@vercel/node": "^5.1.14",
-    "typescript": "^5.8.2",
-    "@types/mongoose": "^5.11.96"
+    "typescript": "^5.8.2"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "mongodb": "^6.14.2",
     "mongoose": "^8.13.1"
   }
