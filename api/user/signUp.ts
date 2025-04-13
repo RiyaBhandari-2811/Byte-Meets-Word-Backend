@@ -9,10 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await connectDB();
     switch (method) {
       case "POST":
-        await userController.createUser(req, res);
-        break;
-      case "GET":
-        await userController.getUser(req, res);
+        await userController.signUpUser(req, res);
         break;
     }
   } catch (error) {
