@@ -1,7 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import tagsController from "../../controllers/tags/tagsController";
 import connectDB from "../../utils/mongodb";
-import { withAuth } from "../../middlewares/AuthenticatedRequest";
+import { userController } from "../../controllers/user/userController";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method } = req;
@@ -10,12 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await connectDB();
     switch (method) {
       case "POST":
-        if (withAuth(req, res)) {
-          await tagsController.createTags(req, res);
-          break;
-        }
-      case "GET":
-        await tagsController.getAllTags(req, res);
+        await userController.signUpUser(req, res);
         break;
     }
   } catch (error) {

@@ -1,12 +1,12 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import Tag from "../../models/Tag";
 import { ITag, IGetTagsResponse } from "../../types/tag";
+import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 
 const tagsController = {
   createTags: async (req: VercelRequest, res: VercelResponse) => {
     try {
       const { tagsName } = req.body;
-
       // Bulk create
       if (Array.isArray(tagsName)) {
         console.log("Creating bulk tags");
