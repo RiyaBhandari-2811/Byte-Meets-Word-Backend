@@ -11,6 +11,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case "POST":
         await courseController.createCourse(req, res);
         break;
+      case "GET":
+        await courseController.getAllCourses(req, res);
+        break;
     }
   } catch (error) {
     res.status(500).json({ error: (error as any).message });
