@@ -1,32 +1,51 @@
-import mongoose from "mongoose";
+import mongoose, { Connection } from "mongoose";
 
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI: string | undefined = process.env.MONGODB_URI;
 
 if (!MONGO_URI) {
   throw new Error(
-    "Please define the MONGO_URI environment variable inside .env"
+    "Please define the MONGODB_URI environment variable inside .env"
   );
 }
 
-let cached = (global as any).mongoose || { conn: null, promise: null };
-
-async function connectDB() {
-  if (cached.conn) {
-    console.log("Using existing database connection");
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGO_URI as string, {}).then((mongoose) => {
-      console.log("New database connection established");
-      return mongoose;
-    });
-  }
-
-  cached.conn = await cached.promise;
-  return cached.conn;
+interface MongooseCache {
+  conn: Connection | null;
+  promise: Promise<Connection> | null;
 }
 
-(global as any).mongoose = cached; // Store connection globally to avoid reconnecting
+declare global {
+  var mongoose: MongooseCache | undefined;
+}
+
+const globalCache: MongooseCache = globalThis.mongoose ?? {
+  conn: null,
+  promise: null,
+};
+
+async function connectDB(): Promise<Connection> {
+  if (globalCache.conn) {
+    console.log("Using cached DB connection");
+    return globalCache.conn;
+  }
+
+  if (!globalCache.promise) {
+    globalCache.promise = mongoose
+      .connect(MONGO_URI as string, {
+        bufferCommands: false,
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+      })
+      .then((mongooseInstance) => {
+        console.log("New DB connection established");
+        return mongooseInstance.connection;
+      });
+  }
+
+  globalCache.conn = await globalCache.promise;
+  globalThis.mongoose = globalCache;
+
+  return globalCache.conn;
+}
 
 export default connectDB;
