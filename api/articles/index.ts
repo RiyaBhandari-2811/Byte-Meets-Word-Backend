@@ -4,6 +4,7 @@ import connectDB from "../../utils/mongodb";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;
+  const { articleId, categoryId, tagId } = query;
 
   try {
     await connectDB();
@@ -12,7 +13,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await articlesController.create(req, res);
         break;
       case "GET":
-        await articlesController.getAll(req, res);
+        if (articleId)
+          return await articlesController.getById(req, res, articleId);
+        else if (categoryId)
+          return await articlesController.getByCategory(req, res, categoryId);
+        else if (tagId)
+          return await articlesController.getByTag(req, res, tagId);
+        else await articlesController.getAll(req, res);
+        break;
+      case "PATCH":
+        if (articleId) await articlesController.update(req, res, articleId);
+        break;
+      case "DELETE":
+        if (articleId) await articlesController.delete(req, res, articleId);
         break;
     }
   } catch (error) {

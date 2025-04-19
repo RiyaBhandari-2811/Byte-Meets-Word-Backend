@@ -3,7 +3,8 @@ import categoriesController from "../../controllers/categories/categoriesControl
 import connectDB from "../../utils/mongodb";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { method } = req;
+  const { method, query } = req;
+  const { categoryId } = query;
 
   try {
     await connectDB();
@@ -14,6 +15,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case "GET":
         await categoriesController.getAllCategories(req, res);
         break;
+      case "PATCH":
+        await categoriesController.updateCategoryById(
+          req,
+          res,
+          categoryId as string
+        );
+        break;
+      case "DELETE":
+        await categoriesController.deleteCategoryById(
+          req,
+          res,
+          categoryId as string
+        );
+        break;
+      default:
+        console.log(`Unsupported method: ${method}`);
+        res.status(405).json({ error: "Method not allowed" });
     }
   } catch (error) {
     res.status(500).json({ error: (error as any).message });
