@@ -1,51 +1,52 @@
 import mongoose, { Connection } from "mongoose";
+import redisClient from "./redisClient";
 
 const MONGO_URI: string | undefined = process.env.MONGODB_URI;
 
 if (!MONGO_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env"
-  );
+  throw new Error("Missing MONGODB_URI in environment variables");
 }
 
-interface MongooseCache {
-  conn: Connection | null;
-  promise: Promise<Connection> | null;
-}
-
-declare global {
-  var mongoose: MongooseCache | undefined;
-}
-
-const globalCache: MongooseCache = globalThis.mongoose ?? {
-  conn: null,
-  promise: null,
-};
+// In-memory cache for current invocation
+let cachedConn: Connection | null = null;
 
 async function connectDB(): Promise<Connection> {
-  if (globalCache.conn) {
-    console.log("Using cached DB connection");
-    return globalCache.conn;
+  console.log("name: ", cachedConn?.name);
+
+  if (cachedConn) {
+    console.log("Using in-memory cached DB connection");
+    return cachedConn;
   }
 
-  if (!globalCache.promise) {
-    globalCache.promise = mongoose
-      .connect(MONGO_URI as string, {
-        bufferCommands: false,
-        maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
-      })
-      .then((mongooseInstance) => {
-        console.log("New DB connection established");
-        return mongooseInstance.connection;
-      });
+  const redisKey = "mongo_connected";
+
+  try {
+    const isConnected: string | null = await redisClient.get(redisKey);
+
+    if (isConnected) {
+      console.log("Redis indicates DB is connected. Proceeding...");
+    } else {
+      console.log("Redis shows no connection. Connecting to MongoDB...");
+    }
+
+    const mongooseInstance = await mongoose.connect(MONGO_URI as string, {
+      bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+
+    cachedConn = mongooseInstance.connection;
+
+    // Set Redis flag with expiry
+    await redisClient.set(redisKey, "1", "EX", 300); // 5-minute expiry
+
+    console.log("MongoDB connection established");
+    return cachedConn;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
   }
-
-  globalCache.conn = await globalCache.promise;
-  globalThis.mongoose = globalCache;
-
-  return globalCache.conn;
 }
 
 export default connectDB;
