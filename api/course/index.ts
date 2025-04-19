@@ -3,7 +3,8 @@ import connectDB from "../../utils/mongodb";
 import courseController from "../../controllers/course/courseController";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { method } = req;
+  const { method, query } = req;
+  const { courseId } = query;
 
   try {
     await connectDB();
@@ -13,6 +14,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         break;
       case "GET":
         await courseController.getAllCourses(req, res);
+        break;
+      case "PATCH":
+        await courseController.updateCourseById(req, res, courseId as string);
+        break;
+      case "DELETE":
+        await courseController.deleteCourseById(req, res, courseId as string);
         break;
     }
   } catch (error) {
