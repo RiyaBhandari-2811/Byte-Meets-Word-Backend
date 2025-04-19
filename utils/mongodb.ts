@@ -1,32 +1,52 @@
-import mongoose from "mongoose";
+import mongoose, { Connection } from "mongoose";
+import redisClient from "./redisClient";
 
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGO_URI: string | undefined = process.env.MONGODB_URI;
 
 if (!MONGO_URI) {
-  throw new Error(
-    "Please define the MONGO_URI environment variable inside .env"
-  );
+  throw new Error("Missing MONGODB_URI in environment variables");
 }
 
-let cached = (global as any).mongoose || { conn: null, promise: null };
+// In-memory cache for current invocation
+let cachedConn: Connection | null = null;
 
-async function connectDB() {
-  if (cached.conn) {
-    console.log("Using existing database connection");
-    return cached.conn;
+async function connectDB(): Promise<Connection> {
+  console.log("name: ", cachedConn?.name);
+
+  if (cachedConn) {
+    console.log("Using in-memory cached DB connection");
+    return cachedConn;
   }
 
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGO_URI as string, {}).then((mongoose) => {
-      console.log("New database connection established");
-      return mongoose;
+  const redisKey = "mongo_connected";
+
+  try {
+    const isConnected: string | null = await redisClient.get(redisKey);
+
+    if (isConnected) {
+      console.log("Redis indicates DB is connected. Proceeding...");
+    } else {
+      console.log("Redis shows no connection. Connecting to MongoDB...");
+    }
+
+    const mongooseInstance = await mongoose.connect(MONGO_URI as string, {
+      bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     });
+
+    cachedConn = mongooseInstance.connection;
+
+    // Set Redis flag with expiry
+    await redisClient.set(redisKey, "1", "EX", 300); // 5-minute expiry
+
+    console.log("MongoDB connection established");
+    return cachedConn;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
   }
-
-  cached.conn = await cached.promise;
-  return cached.conn;
 }
-
-(global as any).mongoose = cached; // Store connection globally to avoid reconnecting
 
 export default connectDB;
