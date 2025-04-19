@@ -4,192 +4,184 @@ import Category from "../models/Category";
 import Tag from "../models/Tag";
 import { IArticleDetail } from "../types/article";
 
+// Helpers
+const getCategoryIdByName = async (name: string): Promise<string | null> => {
+  const category = await Category.findOne({ name });
+  return category?._id?.toString() ?? null;
+};
+
+const getTagIdsByNames = async (tagNames: string[]): Promise<string[]> => {
+  const tagsId: string[] = [];
+  for (const tag of tagNames) {
+    const tagDoc = await Tag.findOne({ name: tag });
+    if (!tagDoc) throw new Error(`TagNotFound:${tag}`);
+    tagsId.push(tagDoc._id as string);
+  }
+  return tagsId;
+};
+
+export const getPagination = (req: VercelRequest) => {
+  const page: number = req.query.page ? Number(req.query.page as string) : 0;
+  const limit: number = req.query.limit ? Number(req.query.limit as string) : 6;
+  const skip: number = page ? (page - 1) * limit : 0;
+  return { page, limit, skip };
+};
+
+export const fetchArticles = async ({
+  categoryId,
+  tagId,
+  req,
+}: {
+  categoryId?: string | string[];
+  tagId?: string | string[];
+  req: VercelRequest;
+}) => {
+  const { page, limit, skip } = getPagination(req);
+  let filter: { category?: string; tags?: string } = {};
+  if (typeof categoryId === "string") filter["category"] = categoryId;
+  if (typeof tagId === "string") filter["tags"] = tagId;
+
+  const result = await Article.aggregate([
+    { $match: filter },
+    {
+      $facet: {
+        data: [
+          { $sort: { createdAt: -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              _id: 1,
+              title: 1,
+              summary: 1,
+              featureImage: 1,
+              readTime: 1,
+              createdAt: 1,
+            },
+          },
+        ],
+        total: [{ $count: "count" }],
+      },
+    },
+  ]);
+
+  const articles = result[0].data;
+  const total = result[0].total[0]?.count || 0;
+  const totalPages = Math.ceil(total / limit);
+
+  return { articles, total, totalPages, page };
+};
+
 export const articlesController = {
   create: async (req: VercelRequest, res: VercelResponse) => {
     try {
-      console.log("Creating article with data:", req.body);
-      const payload: IArticleDetail = req.body as IArticleDetail;
+      const payload = req.body as IArticleDetail;
+      const categoryId: string | null = await getCategoryIdByName(
+        payload.category as string
+      );
 
-      console.log("Finding category ID for category:", payload.category);
-      const category: any = await Category.findOne({ name: payload.category });
-      const categoryId: string | null = category
-        ? category.get("_id").toString()
-        : null;
       if (!categoryId) {
-        console.error("Category not found:", payload.category);
-        return res.status(400).json({
-          message: "Category not found",
-        });
+        return res.status(400).json({ message: "Category not found" });
       }
-      console.log("Category ID found:", categoryId);
 
-      let tagsId: string[] = [];
-      for (const tag of payload.tags) {
-        console.log("Finding tag ID for tag:", tag);
-        const tagObject: any = await Tag.findOne({
-          name: tag,
-        });
-        const tagId: string | null = tagObject
-          ? tagObject.get("_id").toString()
-          : null;
-        if (!tagId) {
-          console.error("Tag not found:", tag);
+      let tagsId: string[];
+      try {
+        tagsId = await getTagIdsByNames(payload.tags);
+      } catch (err) {
+        const message = (err as Error).message;
+        if (message.startsWith("TagNotFound:")) {
           return res.status(400).json({
             message: "Tag not found",
-            tag,
+            tag: message.split(":")[1],
           });
         }
-        console.log("Tag ID found:", tagId);
-        tagsId.push(tagId);
+        throw err;
       }
 
-      console.log("Creating article with category ID and tags ID:", {
-        categoryId,
-        tagsId,
-      });
       const savedArticle = await Article.create({
         ...payload,
         category: categoryId,
         tags: tagsId,
       });
 
-      console.log("Article created successfully:", savedArticle);
       res.status(201).json({
         message: "Article created successfully",
         article: savedArticle,
       });
     } catch (error) {
-      console.error("Error creating article:", error);
       res.status(500).json({
         message: "Internal server error",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   getById: async (
-    req: VercelRequest,
+    _req: VercelRequest,
     res: VercelResponse,
     id: string | string[]
   ) => {
     try {
       const articleId = id as string;
-      const article = await Article.findById(articleId);
+      const article = await Article.findById(articleId).populate("tags");
       if (!article) {
-        return res.status(404).json({
-          message: "Article not found",
-        });
+        return res.status(404).json({ message: "Article not found" });
       }
       res.status(200).json(article);
     } catch (error) {
-      console.error("Error fetching article by ID:", error);
       res.status(500).json({
         message: "Failed to fetch article",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   getByCategory: async (
     req: VercelRequest,
     res: VercelResponse,
     categoryId: string | string[]
   ) => {
     try {
-      const page = req.query.page ? Number(req.query.page as string) : 0;
-      const limit = req.query.limit ? Number(req.query.limit as string) : 6;
-
       const category = await Category.findById(categoryId);
       if (!category) {
-        return res.status(404).json({
-          message: "Category not found",
-          categoryId,
-        });
+        return res.status(404).json({ message: "Category not found" });
       }
 
-      let articles, total, totalPages;
+      const { articles, total, totalPages, page } = await fetchArticles({
+        categoryId,
+        req,
+      });
 
-      if (page) {
-        const skip = (page - 1) * limit;
-        [articles, total] = await Promise.all([
-          Article.find({ category: categoryId })
-            .select("_id title summary featureImage readTime createdAt")
-            .lean()
-            .skip(skip)
-            .limit(limit),
-          Article.countDocuments({ category: categoryId }),
-        ]);
-        totalPages = Math.ceil(total / limit);
-      } else {
-        articles = await Article.find({ category: categoryId })
-          .select("_id title summary featureImage readTime createdAt")
-          .lean();
-        total = articles.length;
-        totalPages = 1;
-      }
-
-      // Transform the _id field to id
-      const formattedArticles = articles.map((article) => ({
-        _id: article._id,
-        title: article.title,
-        description: article.description,
-        featureImage: article.featureImage,
-        readTime: article.readTime,
-        createdAt: article.createdAt,
-      }));
-
-      res.json({
+      res.status(200).json({
         name: category.name,
-        articles: formattedArticles,
+        articles,
         total,
         page: page || "all",
         totalPages,
       });
     } catch (error) {
-      console.error("Error fetching articles by category:", error);
       res.status(500).json({
         message: "Failed to fetch articles",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   getByTag: async (
     req: VercelRequest,
     res: VercelResponse,
     tagId: string | string[]
   ) => {
     try {
-      const page = req.query.page ? Number(req.query.page as string) : 0;
-      const limit = req.query.limit ? Number(req.query.limit as string) : 6;
-
-      // First verify if tag exists
       const tag = await Tag.findById(tagId);
       if (!tag) {
-        return res.status(404).json({
-          message: "Tag not found",
-          tagId,
-        });
+        return res.status(404).json({ message: "Tag not found" });
       }
 
-      let articles, total, totalPages;
-
-      if (page) {
-        const skip = (page - 1) * limit;
-        [articles, total] = await Promise.all([
-          Article.find({ tags: tagId })
-            .select("_id title summary featureImage readTime createdAt")
-            .lean()
-            .skip(skip)
-            .limit(limit),
-          Article.countDocuments({ tags: tagId }),
-        ]);
-        totalPages = Math.ceil(total / limit);
-      } else {
-        // Full dataset response
-        articles = await Article.find({ tags: tagId })
-          .select("_id title summary featureImage readTime createdAt")
-          .lean();
-        total = articles.length;
-        totalPages = 1;
-      }
+      const { articles, total, totalPages, page } = await fetchArticles({
+        tagId,
+        req,
+      });
 
       res.status(200).json({
         name: tag.name,
@@ -199,34 +191,25 @@ export const articlesController = {
         totalPages,
       });
     } catch (error) {
-      console.error("Error fetching articles by tag:", error);
       res.status(500).json({
         message: "Failed to fetch articles",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   getAll: async (req: VercelRequest, res: VercelResponse) => {
     try {
       const page = req.query.page ? Number(req.query.page as string) : 0;
       const limit = req.query.limit ? Number(req.query.limit as string) : 6;
+      const skip = page ? (page - 1) * limit : 0;
 
-      let articles, total, totalPages;
+      const [articles, total] = await Promise.all([
+        Article.find({}).skip(skip).limit(limit),
+        Article.countDocuments(),
+      ]);
 
-      if (page) {
-        const skip = (page - 1) * limit;
-        [articles, total] = await Promise.all([
-          Article.find({}).skip(skip).limit(limit),
-          Article.countDocuments(),
-        ]);
-        totalPages = Math.ceil(total / limit);
-      } else {
-        // Full dataset response
-        articles = await Article.find({});
-        total = articles.length;
-        totalPages = 1;
-      }
-
+      const totalPages = Math.ceil(total / limit);
       res.status(200).json({
         name: "Articles",
         articles,
@@ -235,79 +218,67 @@ export const articlesController = {
         totalPages,
       });
     } catch (error) {
-      console.error("Error fetching articles:", error);
       res.status(500).json({
         message: "Failed to fetch articles",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   update: async (
     req: VercelRequest,
     res: VercelResponse,
     id: string | string[]
   ) => {
     try {
-      let updateData = { ...req.body };
+      const updateData: Record<string, unknown> = { ...req.body };
 
-      // Check if Category exists and replace it with its ID
       if (updateData.Category) {
         const categoryDoc = await Category.findOne({
-          name: updateData.Category,
+          name: updateData.Category as string,
         });
-        if (categoryDoc) {
-          updateData.Category = categoryDoc._id;
-        } else {
+        if (!categoryDoc) {
           return res.status(400).json({ message: "Invalid Category name" });
         }
+        updateData.Category = categoryDoc._id;
       }
 
-      // Check if Tags exist and replace them with their IDs
       if (updateData.tags && Array.isArray(updateData.tags)) {
-        let tagsId: string[] = [];
-        for (const tag of updateData.tags) {
-          console.log("Finding tag ID for tag:", tag);
-          const tagObject: any = await Tag.findOne({
-            name: tag,
-          });
-          const tagId: string | null = tagObject
-            ? tagObject.get("_id").toString()
-            : null;
-          if (!tagId) {
-            console.error("Tag not found:", tag);
+        try {
+          updateData.tags = await getTagIdsByNames(updateData.tags as string[]);
+        } catch (err) {
+          const message = (err as Error).message;
+          if (message.startsWith("TagNotFound:")) {
             return res.status(400).json({
               message: "Tag not found",
-              tag,
+              tag: message.split(":")[1],
             });
           }
-          console.log("Tag ID found:", tagId);
-          tagsId.push(tagId);
+          throw err;
         }
-        updateData.tags = tagsId;
       }
 
       const updatedArticle = await Article.findByIdAndUpdate(id, updateData, {
         new: true,
       });
       if (!updatedArticle) {
-        return res.status(404).json({
-          message: "Article not found",
-        });
+        return res.status(404).json({ message: "Article not found" });
       }
+
       res.status(200).json({
         message: "Article updated successfully",
         article: updatedArticle,
       });
     } catch (error) {
-      console.error("Error updating article:", error);
       res.status(500).json({
         message: "Failed to update article",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
+
   delete: async (
-    req: VercelRequest,
+    _req: VercelRequest,
     res: VercelResponse,
     id: string | string[]
   ) => {
@@ -315,19 +286,16 @@ export const articlesController = {
       const articleId = id as string;
       const deletedArticle = await Article.findByIdAndDelete(articleId);
       if (!deletedArticle) {
-        return res.status(404).json({
-          message: "Article not found",
-        });
+        return res.status(404).json({ message: "Article not found" });
       }
       res.status(200).json({
         message: "Article deleted successfully",
         article: deletedArticle,
       });
     } catch (error) {
-      console.error("Error deleting article:", error);
       res.status(500).json({
         message: "Failed to delete article",
-        error: (error as any).message,
+        error: (error as Error).message,
       });
     }
   },
