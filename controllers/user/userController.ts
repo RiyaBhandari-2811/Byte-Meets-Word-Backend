@@ -9,13 +9,17 @@ export const userController = {
     try {
       const user = req.body;
 
+      console.log("Creating user with data:", user);
+      
+
       if (user.role !== "admin") {
+        console.log("Access denied");
         return res.status(403).json({ message: "Access denied." });
       }
 
-      const savedUser = await User.create(user);
+      await User.create(user);
       res.status(201).json({
-        user: savedUser,
+        message: "User created successfully",
       });
     } catch (error) {
       res.status(500).json({
@@ -43,8 +47,8 @@ export const userController = {
       const isMatch: boolean = await bcrypt.compare(password, user.password);
 
       if (isMatch) {
-        const payload  = user._id;
-        const JWT_SECRET : string | undefined = process.env.JWT_SECRET;
+        const payload = user._id;
+        const JWT_SECRET: string | undefined = process.env.JWT_SECRET;
         const token = jwt.sign({ payload }, JWT_SECRET as string, {
           expiresIn: "1h",
         });
