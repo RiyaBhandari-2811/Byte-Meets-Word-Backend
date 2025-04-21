@@ -4,7 +4,6 @@ import { userController } from "../../controllers/user/userController";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method } = req;
-  console.log("Request method:", method);
 
   try {
     await connectDB();

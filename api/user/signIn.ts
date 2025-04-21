@@ -7,6 +7,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await connectDB();
     switch (method) {
+      case "OPTIONS":
+        return res.status(200).end();
       case "POST":
         await userController.signInUser(req, res);
         break;
