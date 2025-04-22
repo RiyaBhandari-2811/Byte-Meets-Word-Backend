@@ -10,7 +10,6 @@ export const userController = {
       const user = req.body;
 
       console.log("Creating user with data:", user);
-      
 
       if (user.role !== "admin") {
         console.log("Access denied");
@@ -32,6 +31,8 @@ export const userController = {
     try {
       const { email, password } = req.body;
 
+      console.log("Signing in user with email:", email);
+
       const user: IUser | null = await User.findOne({ email });
 
       if (!user) {
@@ -52,10 +53,9 @@ export const userController = {
         const token = jwt.sign({ payload }, JWT_SECRET as string, {
           expiresIn: "1h",
         });
-        res.setHeader("Authorization", `Bearer ${token}`);
+
         return res.status(200).json({
-          message: "User signed in successfully",
-          user,
+          token,
         });
       } else {
         return res.status(401).json({
