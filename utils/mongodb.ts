@@ -1,4 +1,5 @@
 import mongoose, { Connection } from "mongoose";
+import logger from "./logger";
 
 const MONGO_URI: string | undefined = process.env.MONGODB_URI;
 
@@ -23,6 +24,8 @@ const globalCache: MongooseCache = globalThis.mongoose ?? {
 };
 
 async function connectDB(): Promise<Connection> {
+  const start = Date.now();
+  logger.info("Connecting to MongoDB... : ", start);
   if (globalCache.conn) {
     console.log("Using cached DB connection");
     return globalCache.conn;
@@ -37,7 +40,7 @@ async function connectDB(): Promise<Connection> {
         socketTimeoutMS: 45000,
       })
       .then((mongooseInstance) => {
-        console.log("New DB connection established");
+        console.log("New DB connection established" , Date.now() - start);
         return mongooseInstance.connection;
       });
   }
