@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import Category from "../../models/Category";
+import logger from "../../utils/logger";
 
 const categoriesController = {
   createCategories: async (req: VercelRequest, res: VercelResponse) => {
@@ -42,9 +43,9 @@ const categoriesController = {
   },
   getAllCategories: async (req: VercelRequest, res: VercelResponse) => {
     try {
-      console.log("Fetching all categories...");
+      logger.info("Fetching all categories...");
       const categories = await Category.find({});
-      console.log("Fetched categories successfully");
+      logger.info("Fetched categories successfully");
       res.status(200).json(categories);
     } catch (error) {
       console.error("Error fetching categories:", error);
