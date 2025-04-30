@@ -1,8 +1,22 @@
-import { createClient } from 'redis';
+import { createClient } from "redis";
 
-(async () => {
-	const redis = await createClient({ url: process.env.REDIS_URL }).connect();
+let redis: Awaited<ReturnType<typeof createClient>> | null = null;
 
-	await redis.set('key', 'value');
-	const value = await redis.get('key');
-})();
+export async function getRedisClient() {
+	if (!redis) {
+		console.log("Creating a new Redis client...");
+		const redisUrl = process.env.REDIS_URL;
+
+		if (!redisUrl) {
+			throw new Error("REDIS_URL environment variable is not set");
+		}
+
+		const client = createClient({ url: redisUrl });
+		client.on("error", (err) => console.error("Redis Client Error", err));
+		redis = await client.connect();
+		console.log("Redis client connected successfully.");
+	} else {
+		console.log("Reusing existing Redis client...");
+	}
+	return redis;
+}
