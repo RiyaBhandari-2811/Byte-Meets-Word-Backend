@@ -2,6 +2,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import Tag from "../../models/Tag";
 import { ITag, IGetTagsResponse } from "../../types/tag";
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
+import { getRedisClient } from "../../utils/redis";
 
 const tagsController = {
   createTags: async (req: VercelRequest, res: VercelResponse) => {
@@ -45,16 +46,25 @@ const tagsController = {
 
   getAllTags: async (req: VercelRequest, res: VercelResponse) => {
     try {
+      const redis = await getRedisClient();
       const page = req.query.page ? Number(req.query.page) : 0;
       const limit = req.query.limit ? Number(req.query.limit) : 30;
-
+  
+      const redisKey = `tags:page=${page}:limit=${limit}`;
+      const cachedData = await redis.get(redisKey);
+  
+      if (cachedData) {
+        const parsedData = JSON.parse(cachedData);
+        return res.status(200).json(parsedData);
+      }
+  
       let tags: ITag[];
       let total: number;
       let totalPages: number;
-
+  
       if (page > 0) {
         const skip = (page - 1) * limit;
-
+  
         const [fetchedTags, count] = await Promise.all([
           (
             await Tag.find({}).select("_id name").lean().skip(skip).limit(limit)
@@ -64,7 +74,7 @@ const tagsController = {
           })) as ITag[],
           Tag.countDocuments(),
         ]);
-
+  
         tags = fetchedTags;
         total = count;
         totalPages = Math.ceil(total / limit);
@@ -76,14 +86,19 @@ const tagsController = {
         total = tags.length;
         totalPages = 1;
       }
-
+  
       const response: IGetTagsResponse = {
         tags,
         total,
         page: page || "all",
         totalPages,
       };
-
+  
+      // Cache the response for 10 minutes (600 seconds)
+      await redis.set(redisKey, JSON.stringify(response), {
+        EX: 600,
+      });
+  
       res.status(200).json(response);
     } catch (error) {
       console.error("Error fetching tags:", error);
@@ -92,7 +107,7 @@ const tagsController = {
         error: (error as Error).message,
       });
     }
-  },
+  },  
 
   updateTagById: async (
     req: VercelRequest,
