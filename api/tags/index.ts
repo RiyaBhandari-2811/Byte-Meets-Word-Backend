@@ -1,7 +1,7 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import tagsController from "../../controllers/tags/tagsController";
-import { withAuth } from "../../middlewares/AuthenticatedRequest";
 import getAllTags from "../../controllers/tags/functions/getAllTags";
+import createTags from "../../controllers/tags/functions/CreateTags";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;
@@ -10,10 +10,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case "POST":
-        if (withAuth(req, res)) {
-          await tagsController.createTags(req, res);
-          break;
-        }
+        await createTags(req, res);
+        break;
       case "GET":
         await getAllTags(req, res);
         break;

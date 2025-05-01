@@ -1,3 +1,4 @@
+import { VercelRequest, VercelResponse } from "@vercel/node";
 import { CACHE_KEYS, TTL } from "../../../constants/redisConstants";
 import Tag from "../../../models/Tag";
 import { IGetTagsResponse } from "../../../types/tag";
@@ -7,7 +8,7 @@ import logger from "../../../utils/logger";
 import connectDB from "../../../utils/mongodb";
 import { getRedisClient } from "../../../utils/redis";
 
-const getAllTags = async (req: any, res: any) => {
+const getAllTags = async (req: VercelRequest, res: VercelResponse) => {
   const redis = await getRedisClient();
   const { page, limit, skip } = getPagination(req, true);
   const cacheKey = CACHE_KEYS.GET_TAGS(page, limit);

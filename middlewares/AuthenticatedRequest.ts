@@ -1,28 +1,32 @@
-import { VercelApiHandler, VercelRequest, VercelResponse } from "@vercel/node";
+import { VercelRequest, VercelResponse } from "@vercel/node";
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
+import logger from "../utils/logger";
+import AppError from "../utils/AppError";
 
 export interface AuthenticatedRequest {
   user?: string | JwtPayload;
 }
 
-export function withAuth(req: VercelRequest, res: VercelResponse) {
-  const authHeader: string | undefined = req.headers.authorization;
+const withAuth = (
+  req: VercelRequest,
+  res: VercelResponse
+): string | JwtPayload | undefined => {
+  const token = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized: No token provided" });
+  if (!token) {
+    throw new AppError("Unauthorized: No token provided", 401);
   }
 
-  const token: string = authHeader.split(" ")[1];
-
   try {
-    const decoded: string | JwtPayload = jsonwebtoken.verify(
+    const decoded = jsonwebtoken.verify(
       token,
       process.env.JWT_SECRET as string
     );
-
-    return decoded && true;
+    logger.debug("Token verified successfully");
+    return decoded;
   } catch (error) {
-    console.error("Token verification error:", error);
-    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    throw new AppError("Unauthorized: Invalid token", 401);
   }
-}
+};
+
+export default withAuth;
