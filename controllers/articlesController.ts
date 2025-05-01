@@ -3,6 +3,8 @@ import Article from "../models/Article";
 import Category from "../models/Category";
 import Tag from "../models/Tag";
 import { IArticleDetail } from "../types/article";
+import { getPagination } from "../utils/getPagination";
+import AppError from "../utils/AppError";
 
 // Helpers
 const getCategoryIdByName = async (name: string): Promise<string | null> => {
@@ -18,13 +20,6 @@ const getTagIdsByNames = async (tagNames: string[]): Promise<string[]> => {
     tagsId.push(tagDoc._id as string);
   }
   return tagsId;
-};
-
-export const getPagination = (req: VercelRequest) => {
-  const page: number = req.query.page ? Number(req.query.page as string) : 0;
-  const limit: number = req.query.limit ? Number(req.query.limit as string) : 6;
-  const skip: number = page ? (page - 1) * limit : 0;
-  return { page, limit, skip };
 };
 
 export const fetchArticles = async ({
@@ -160,10 +155,7 @@ export const articlesController = {
         totalPages,
       });
     } catch (error) {
-      res.status(500).json({
-        message: "Failed to fetch articles",
-        error: (error as Error).message,
-      });
+      throw new AppError("Failed to fetch articles");
     }
   },
 
