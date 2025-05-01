@@ -1,8 +1,12 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import Tag from "../../models/Tag";
-import { ITag, IGetTagsResponse } from "../../types/tag";
-import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
+import { IGetTagsResponse } from "../../types/tag";
 import { getRedisClient } from "../../utils/redis";
+import connectDB from "../../utils/mongodb";
+import { CACHE_KEYS, TTL } from "../../constants/redisConstants";
+import { getPagination } from "../../utils/getPagination";
+import logger from "../../utils/logger";
+import AppError from "../../utils/AppError";
 
 const tagsController = {
   createTags: async (req: VercelRequest, res: VercelResponse) => {
@@ -45,69 +49,55 @@ const tagsController = {
   },
 
   getAllTags: async (req: VercelRequest, res: VercelResponse) => {
+    const redis = await getRedisClient();
+    const { page, limit, skip } = getPagination(req, true);
+    const cacheKey = CACHE_KEYS.GET_TAGS(page, limit);
+
     try {
-      const redis = await getRedisClient();
-      const page = req.query.page ? Number(req.query.page) : 0;
-      const limit = req.query.limit ? Number(req.query.limit) : 30;
-  
-      const redisKey = `tags:page=${page}:limit=${limit}`;
-      const cachedData = await redis.get(redisKey);
-  
+      const cachedData = await redis.get(cacheKey);
       if (cachedData) {
-        const parsedData = JSON.parse(cachedData);
-        return res.status(200).json(parsedData);
+        logger.debug("Cache hit: Serving tags from Redis", { page, limit });
+        return res.status(200).json(JSON.parse(cachedData));
       }
-  
-      let tags: ITag[];
-      let total: number;
-      let totalPages: number;
-  
-      if (page > 0) {
-        const skip = (page - 1) * limit;
-  
-        const [fetchedTags, count] = await Promise.all([
-          (
-            await Tag.find({}).select("_id name").lean().skip(skip).limit(limit)
-          ).map((tag) => ({
-            _id: tag._id.toString(),
-            name: tag.name,
-          })) as ITag[],
-          Tag.countDocuments(),
-        ]);
-  
-        tags = fetchedTags;
-        total = count;
-        totalPages = Math.ceil(total / limit);
-      } else {
-        tags = (await Tag.find({}).select("_id name").lean()).map((tag) => ({
-          _id: tag._id.toString(),
-          name: tag.name,
-        })) as ITag[];
-        total = tags.length;
-        totalPages = 1;
-      }
-  
+
+      logger.debug("Cache miss: Fetching tags from DB", { page, limit });
+      await connectDB();
+
+      const [aggregationResult] = await Tag.aggregate([
+        {
+          $facet: {
+            data: [
+              { $skip: skip },
+              { $limit: limit },
+              {
+                $project: {
+                  _id: 1,
+                  name: 1,
+                },
+              },
+            ],
+            total: [{ $count: "count" }],
+          },
+        },
+      ]);
+
+      const total = aggregationResult?.total?.[0]?.count || 0;
+
       const response: IGetTagsResponse = {
-        tags,
+        tags: aggregationResult.data,
         total,
         page: page || "all",
-        totalPages,
+        totalPages: Math.ceil(total / limit),
       };
-  
-      // Cache the response for 10 minutes (600 seconds)
-      await redis.set(redisKey, JSON.stringify(response), {
-        EX: 600,
-      });
-  
-      res.status(200).json(response);
+
+      await redis.set(cacheKey, JSON.stringify(response), { EX: TTL.TAGS });
+      logger.debug("Data cached in Redis", { key: cacheKey, ttl: TTL.TAGS });
+
+      return res.status(200).json(response);
     } catch (error) {
-      console.error("Error fetching tags:", error);
-      res.status(500).json({
-        message: "Failed to fetch tags",
-        error: (error as Error).message,
-      });
+      throw new AppError("Failed to fetch tags");
     }
-  },  
+  },
 
   updateTagById: async (
     req: VercelRequest,

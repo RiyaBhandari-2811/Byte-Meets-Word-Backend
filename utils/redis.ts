@@ -1,22 +1,20 @@
 import { createClient } from "redis";
 
-let redis: Awaited<ReturnType<typeof createClient>> | null = null;
+let globalRedis = globalThis as unknown as {
+  redis: ReturnType<typeof createClient> | null;
+  isConnected: boolean;
+};
+
+globalRedis.redis ??= createClient({ url: process.env.REDIS_URL! });
+globalRedis.isConnected ??= false;
 
 export async function getRedisClient() {
-	if (!redis) {
-		console.log("Creating a new Redis client...");
-		const redisUrl = process.env.REDIS_URL;
-
-		if (!redisUrl) {
-			throw new Error("REDIS_URL environment variable is not set");
-		}
-
-		const client = createClient({ url: redisUrl });
-		client.on("error", (err) => console.error("Redis Client Error", err));
-		redis = await client.connect();
-		console.log("Redis client connected successfully.");
-	} else {
-		console.log("Reusing existing Redis client...");
-	}
-	return redis;
+  if (!globalRedis.isConnected) {
+    await globalRedis.redis!.connect();
+    globalRedis.isConnected = true;
+    console.log("Connected to Redis");
+  } else {
+    console.log("Using existing Redis connection");
+  }
+  return globalRedis.redis!;
 }
