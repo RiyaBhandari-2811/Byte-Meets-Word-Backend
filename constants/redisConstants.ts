@@ -1,7 +1,9 @@
 export const CACHE_KEYS = {
-  GET_TAGS: (page: number, limit: number) => `tags:page=${page}:limit=${limit}`,
+  TAGS: (page: number, limit: number) => `tags:page=${page}:limit=${limit}`,
   CATEGORIES: "cache:categories",
-  ARTICLE: (id: string) => `cache:article:${id}`,
+  ARTICLES: (page: number, limit: number) =>
+    `cache:articles:page=${page}:limit=${limit}`,
+  ARTICLE_BY_ID: (id: string) => `cache:article:${id}`,
   ARTICLES_BY_CATEGORY: (category: string) =>
     `cache:articles:category:${category}`,
   ARTICLES_BY_TAG: (tag: string) => `cache:articles:tag:${tag}`,

@@ -4,6 +4,7 @@ export interface ITag {
 }
 
 export interface IGetTagsResponse {
+  name: string;
   tags: ITag[];
   total: number;
   page: number | string;

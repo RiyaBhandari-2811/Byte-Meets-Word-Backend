@@ -10,7 +10,7 @@ import { getRedisClient } from "../../utils/redis";
 const getAllTags = async (req: VercelRequest, res: VercelResponse) => {
   const redis = await getRedisClient();
   const { page, limit, skip } = getPagination(req, true);
-  const cacheKey = CACHE_KEYS.GET_TAGS(page, limit);
+  const cacheKey = CACHE_KEYS.TAGS(page, limit);
 
   try {
     const cachedData = await redis.get(cacheKey);
@@ -26,6 +26,7 @@ const getAllTags = async (req: VercelRequest, res: VercelResponse) => {
     logger.debug("Cache miss: Fetching tags from DB", { page, limit });
 
     await connectDB();
+    logger.debug("Connected to MongoDB - querying tags collection");
 
     const [aggregationResult] = await Tag.aggregate([
       {
@@ -49,6 +50,7 @@ const getAllTags = async (req: VercelRequest, res: VercelResponse) => {
     const totalPages = Math.ceil(total / limit);
 
     const response: IGetTagsResponse = {
+      name: "Tags",
       tags: aggregationResult.data,
       total,
       page: page || "all",

@@ -16,30 +16,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     query,
   });
 
-  try {
-    switch (method) {
-      case "POST":
-        logger.debug("Handling POST /tags");
-        await createTags(req, res);
-        break;
-      case "GET":
-        logger.debug("Handling GET /tags");
-        await getAllTags(req, res);
-        break;
-      case "PATCH":
-        logger.debug("Handling PATCH /tags", { tagId });
-        await updateTagById(req, res, tagId as string);
-        break;
-      case "DELETE":
-        logger.debug("Handling DELETE /tags", { tagId });
-        await deleteTagById(req, res, tagId as string);
-        break;
-      default:
-        logger.debug("Unsupported HTTP method", { method });
-        res.status(405).json({ message: "Method not allowed" });
-    }
-  } catch (error) {
-    logger.error("Unhandled error in tags handler", { error });
-    res.status(500).json({ error: (error as any).message });
+  switch (method) {
+    case "POST":
+      logger.debug("Handling POST /tags");
+      await createTags(req, res);
+      break;
+    case "GET":
+      logger.debug("Handling GET /tags");
+      await getAllTags(req, res);
+      break;
+    case "PATCH":
+      logger.debug("Handling PATCH /tags", { tagId });
+      await updateTagById(req, res, tagId as string);
+      break;
+    case "DELETE":
+      logger.debug("Handling DELETE /tags", { tagId });
+      await deleteTagById(req, res, tagId as string);
+      break;
+    default:
+      logger.debug(`Unsupported HTTP method: ${method}`);
+      res.setHeader("Allow", ["POST", "GET", "PATCH", "DELETE"]);
+      res.status(405).end(`Method ${method} Not Allowed`);
   }
 }
