@@ -155,7 +155,10 @@ export const articlesController = {
         totalPages,
       });
     } catch (error) {
-      throw new AppError("Failed to fetch articles");
+      res.status(500).json({
+        message: "Failed to fetch articles",
+        error: (error as Error).message,
+      });
     }
   },
 

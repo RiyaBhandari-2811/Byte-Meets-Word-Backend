@@ -25,13 +25,15 @@ const globalCache: MongooseCache = globalThis.mongoose ?? {
 
 async function connectDB(): Promise<Connection> {
   const start = Date.now();
-  logger.info("Connecting to MongoDB... : ", start);
+  logger.info("Attempting to connect to MongoDB...");
+
   if (globalCache.conn) {
-    console.log("Using cached DB connection");
+    logger.info("Using cached MongoDB connection.");
     return globalCache.conn;
   }
 
   if (!globalCache.promise) {
+    logger.debug("No cached promise found. Creating new connection promise.");
     globalCache.promise = mongoose
       .connect(MONGO_URI as string, {
         bufferCommands: false,
@@ -40,15 +42,27 @@ async function connectDB(): Promise<Connection> {
         socketTimeoutMS: 45000,
       })
       .then((mongooseInstance) => {
-        console.log("New DB connection established" , Date.now() - start);
+        const duration = Date.now() - start;
+        logger.info(`New MongoDB connection established in ${duration}ms.`);
         return mongooseInstance.connection;
+      })
+      .catch((error) => {
+        logger.error("MongoDB connection failed", { error });
+        throw error;
       });
+  } else {
+    logger.debug("Using existing connection promise.");
   }
 
-  globalCache.conn = await globalCache.promise;
-  globalThis.mongoose = globalCache;
-
-  return globalCache.conn;
+  try {
+    globalCache.conn = await globalCache.promise;
+    globalThis.mongoose = globalCache;
+    logger.info("MongoDB connection ready.");
+    return globalCache.conn;
+  } catch (error) {
+    logger.error("Error awaiting MongoDB connection promise", { error });
+    throw error;
+  }
 }
 
 export default connectDB;
