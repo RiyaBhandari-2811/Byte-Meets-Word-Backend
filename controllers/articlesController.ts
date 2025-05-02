@@ -4,7 +4,6 @@ import Category from "../models/Category";
 import Tag from "../models/Tag";
 import { IArticleDetail } from "../types/article";
 import { getPagination } from "../utils/getPagination";
-import AppError from "../utils/AppError";
 
 // Helpers
 const getCategoryIdByName = async (name: string): Promise<string | null> => {
@@ -155,7 +154,10 @@ export const articlesController = {
         totalPages,
       });
     } catch (error) {
-      throw new AppError("Failed to fetch articles");
+      res.status(500).json({
+        message: "Failed to fetch articles",
+        error: (error as Error).message,
+      });
     }
   },
 

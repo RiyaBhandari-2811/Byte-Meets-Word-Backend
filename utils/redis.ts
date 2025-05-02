@@ -1,20 +1,28 @@
-import { createClient } from "redis";
+import { createClient, RedisClientType } from "redis";
+import logger from "./logger";
 
 let globalRedis = globalThis as unknown as {
-  redis: ReturnType<typeof createClient> | null;
+  redis: RedisClientType | null;
   isConnected: boolean;
 };
 
 globalRedis.redis ??= createClient({ url: process.env.REDIS_URL! });
 globalRedis.isConnected ??= false;
 
-export async function getRedisClient() {
+export async function getRedisClient(): Promise<RedisClientType> {
+  const redis = globalRedis.redis!;
+
   if (!globalRedis.isConnected) {
-    await globalRedis.redis!.connect();
-    globalRedis.isConnected = true;
-    console.log("Connected to Redis");
+    try {
+      await redis.connect();
+      globalRedis.isConnected = true;
+      logger.debug("Successfully connected to Redis");
+    } catch (error) {
+      logger.error("Failed to connect to Redis", { error });
+    }
   } else {
-    console.log("Using existing Redis connection");
+    logger.debug("Using existing Redis connection");
   }
-  return globalRedis.redis!;
+
+  return redis;
 }
