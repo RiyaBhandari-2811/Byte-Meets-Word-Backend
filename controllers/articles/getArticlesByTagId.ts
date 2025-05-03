@@ -1,25 +1,22 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import Category from "../../models/Category";
 import logger from "../../utils/logger";
-import { getRedisClient } from "../../utils/redis";
 import fetchArticlesByTagOrCategory from "./helpers/fetchArticlesByTagOrCategory";
 
-const getArticlesByCategory = async (
+const getArticlesByTagId = async (
   req: VercelRequest,
   res: VercelResponse,
-  categoryId: string | string[]
+  tagId: string | string[]
 ) => {
   try {
     logger.info("Feching articles by category...");
 
-    const response =
-      await fetchArticlesByTagOrCategory({
-        categoryId,
-        req,res
-      });
+    const response = await fetchArticlesByTagOrCategory({
+      tagId,
+      req,
+      res,
+    });
 
-      res.status(200).json(response);
-
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch articles",
@@ -28,4 +25,4 @@ const getArticlesByCategory = async (
   }
 };
 
-export default getArticlesByCategory;
+export default getArticlesByTagId;
