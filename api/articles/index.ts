@@ -1,12 +1,12 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import { articlesController } from "../../controllers/articlesController";
 import createArticle from "../../controllers/articles/createArticle";
 import logger from "../../utils/logger";
 import updatedArticleById from "../../controllers/articles/updateArticleById";
 import deleteArticleById from "../../controllers/articles/deleteArticleById";
 import getAllArticles from "../../controllers/articles/getAllArticles";
-import getArticlesByCategory from "../../controllers/articles/getArticlesByCategory";
+import getArticlesByCategoryId from "../../controllers/articles/getArticlesByCategoryId";
 import getArticleById from "../../controllers/articles/getArticleById";
+import getArticlesByTagId from "../../controllers/articles/getArticlesByTagId";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query, url } = req;
@@ -30,10 +30,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await getArticleById(req, res, articleId);
       } else if (categoryId) {
         logger.debug(`Routing to get articles by Category ID: ${categoryId}`);
-        return await getArticlesByCategory(req, res, categoryId);
+        return await getArticlesByCategoryId(req, res, categoryId);
       } else if (tagId) {
         logger.debug(`Routing to get articles by Tag ID: ${tagId}`);
-        return await articlesController.getByTag(req, res, tagId);
+        return await getArticlesByTagId(req, res, tagId);
       } else {
         logger.debug("Routing to get all articles.");
         await getAllArticles(req, res);
