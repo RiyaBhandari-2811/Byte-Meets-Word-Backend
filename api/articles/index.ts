@@ -5,6 +5,8 @@ import logger from "../../utils/logger";
 import updatedArticleById from "../../controllers/articles/updateArticleById";
 import deleteArticleById from "../../controllers/articles/deleteArticleById";
 import getAllArticles from "../../controllers/articles/getAllArticles";
+import getArticlesByCategory from "../../controllers/articles/getArticlesByCategory";
+import getArticleById from "../../controllers/articles/getArticleById";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query, url } = req;
@@ -25,10 +27,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     case "GET":
       if (articleId) {
         logger.debug(`Routing to get article by ID: ${articleId}`);
-        return await articlesController.getById(req, res, articleId);
+        return await getArticleById(req, res, articleId);
       } else if (categoryId) {
         logger.debug(`Routing to get articles by Category ID: ${categoryId}`);
-        return await articlesController.getByCategory(req, res, categoryId);
+        return await getArticlesByCategory(req, res, categoryId);
       } else if (tagId) {
         logger.debug(`Routing to get articles by Tag ID: ${tagId}`);
         return await articlesController.getByTag(req, res, tagId);

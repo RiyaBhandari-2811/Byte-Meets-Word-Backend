@@ -47,7 +47,7 @@ export const fetchArticles = async ({
             $project: {
               _id: 1,
               title: 1,
-              summary: 1,
+              description: 1,
               featureImage: 1,
               readTime: 1,
               createdAt: 1,

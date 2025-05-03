@@ -1,12 +1,13 @@
 export const CACHE_KEYS = {
   TAGS: (page: number, limit: number) => `tags:page=${page}:limit=${limit}`,
-  CATEGORIES: "cache:categories",
+  CATEGORIES: "categories",
   ARTICLES: (page: number, limit: number) =>
-    `cache:articles:page=${page}:limit=${limit}`,
-  ARTICLE_BY_ID: (id: string) => `cache:article:${id}`,
-  ARTICLES_BY_CATEGORY: (category: string) =>
-    `cache:articles:category:${category}`,
-  ARTICLES_BY_TAG: (tag: string) => `cache:articles:tag:${tag}`,
+    `articles:page=${page}:limit=${limit}`,
+  ARTICLE_BY_ID: (id: string) => `article:${id}`,
+  ARTICLES_BY_CATEGORY: (category: string, page: number, limit: number) =>
+    `articles:category:${category}:page=${page}:limit=${limit}`,
+  ARTICLES_BY_TAG: (tag: string, page: number, limit: number) =>
+    `articles:tag:${tag}:page=${page}:limit=${limit}`,
 };
 
 export const TTL = {
