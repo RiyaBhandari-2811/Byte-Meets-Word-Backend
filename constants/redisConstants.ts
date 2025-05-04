@@ -9,10 +9,12 @@ export const CACHE_KEYS = {
     `articles:category:${category}:page=${page}:limit=${limit}`,
   ARTICLES_BY_TAG: (tag: string, page: number, limit: number) =>
     `articles:tag:${tag}:page=${page}:limit=${limit}`,
+  CONTENT_RAIL: `contentRail`,
 };
 
 export const TTL = {
   TAGS: 60 * 60 * 24 * 7, // 7 days
   CATEGORIES: 60 * 60 * 24 * 7, // 7 days
   ARTICLES: 60 * 60 * 24, // 1 day
+  CONTENT_RAIL: 60 * 60 * 24, // 1 day
 };
