@@ -1,18 +1,26 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import connectDB from "../../utils/mongodb";
-import contentRailController from "../../controllers/contentRail/contentRailController";
+import getAllRails from "../../controllers/contentRail/getAllRails";
+import logger from "../../utils/logger";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { method } = req;
+  const { method, url } = req;
+  const logPrefix = "[ContentRail Handler]";
+
+  logger.info(`${logPrefix} Incoming ${method} request: ${url}`);
 
   try {
-    await connectDB();
     switch (method) {
       case "GET":
-        await contentRailController.getAllRails(req, res);
+        logger.info(`${logPrefix} Handling GET request`);
+        await getAllRails(req, res);
         break;
+      default:
+        logger.warn(`${logPrefix} Method ${method} not allowed`);
+        res.setHeader("Allow", ["GET"]);
+        res.status(405).end(`Method ${method} Not Allowed`);
     }
   } catch (error) {
+    logger.error(`${logPrefix} Unexpected error: ${error}`);
     res.status(500).json({ error: (error as any).message });
   }
 }
