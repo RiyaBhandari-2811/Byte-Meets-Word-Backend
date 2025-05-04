@@ -6,12 +6,12 @@ import updateTagById from "../../controllers/tags/updateTagById";
 import logger from "../../utils/logger";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { method, query } = req;
+  const { method, query, url } = req;
   const { tagId } = query;
 
   logger.debug("Incoming request", {
     method,
-    url: req.url,
+    url,
     tagId,
     query,
   });
@@ -26,11 +26,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await getAllTags(req, res);
       break;
     case "PATCH":
-      logger.debug("Handling PATCH /tags", { tagId });
+      logger.debug(`Handling PATCH /tags ${tagId}`);
       await updateTagById(req, res, tagId as string);
       break;
     case "DELETE":
-      logger.debug("Handling DELETE /tags", { tagId });
+      logger.debug(`Handling DELETE /tags ${tagId}`);
       await deleteTagById(req, res, tagId as string);
       break;
     default:
