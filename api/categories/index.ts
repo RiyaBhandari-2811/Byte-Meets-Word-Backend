@@ -2,19 +2,24 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import categoriesController from "../../controllers/categories/categoriesController";
 import connectDB from "../../utils/mongodb";
 import logger from "../../utils/logger";
+import createCategories from "../../controllers/categories/createCategories";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { method, query } = req;
+  const { method, query, url } = req;
   const { categoryId } = query;
 
-  logger.info(`Received ${method} request for /api/categories`);
+  logger.debug("Incoming request", {
+    method,
+    url,
+    categoryId,
+    query,
+  });
 
   try {
-    await connectDB();
-    logger.info("Connected to MongoDB");
     switch (method) {
       case "POST":
-        await categoriesController.createCategories(req, res);
+        logger.debug("Handling POST /categories");
+        await createCategories(req, res);
         break;
       case "GET":
         await categoriesController.getAllCategories(req, res);
