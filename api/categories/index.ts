@@ -3,6 +3,7 @@ import categoriesController from "../../controllers/categories/categoriesControl
 import connectDB from "../../utils/mongodb";
 import logger from "../../utils/logger";
 import createCategories from "../../controllers/categories/createCategories";
+import getAllCategories from "../../controllers/categories/getAllCategories";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query, url } = req;
@@ -22,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await createCategories(req, res);
         break;
       case "GET":
-        await categoriesController.getAllCategories(req, res);
+        await getAllCategories(req, res);
         break;
       case "PATCH":
         await categoriesController.updateCategoryById(
