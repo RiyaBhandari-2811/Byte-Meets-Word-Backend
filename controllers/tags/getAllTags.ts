@@ -15,15 +15,11 @@ const getAllTags = async (req: VercelRequest, res: VercelResponse) => {
   try {
     const cachedData = await redis.get(cacheKey);
     if (cachedData) {
-      logger.debug("Cache hit: Serving tags from Redis", {
-        page,
-        limit,
-        cacheKey,
-      });
+      logger.debug(`Cache hit: Serving tags from Redis. Page: ${page}, Limit: ${limit}, CacheKey: ${cacheKey}`);
       return res.status(200).json(JSON.parse(cachedData));
     }
 
-    logger.debug("Cache miss: Fetching tags from DB", { page, limit });
+    logger.debug(`Cache miss: Fetching tags from DB. Page: ${page}, Limit: ${limit}`);
 
     await connectDB();
     logger.debug("Connected to MongoDB - querying tags collection");
@@ -58,11 +54,11 @@ const getAllTags = async (req: VercelRequest, res: VercelResponse) => {
     };
 
     await redis.set(cacheKey, JSON.stringify(response), { EX: TTL.TAGS });
-    logger.debug("Data cached in Redis", { cacheKey, ttl: TTL.TAGS });
+    logger.debug(`Data cached in Redis. CacheKey: ${cacheKey}, TTL: ${TTL.TAGS}`);
 
     return res.status(200).json(response);
   } catch (error) {
-    logger.error("Failed to fetch tags", { error });
+    logger.error(`Failed to fetch tags. Error: ${error}`);
     return res.status(500).json({ error: "Failed to fetch tags" });
   }
 };

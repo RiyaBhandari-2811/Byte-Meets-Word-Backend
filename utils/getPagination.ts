@@ -7,7 +7,7 @@ export const getPagination = (req: VercelRequest, forTag: boolean = false) => {
     : PAGINATION.PAGE;
   const limit: number = req.query.limit
     ? Number(req.query.limit as string)
-    : forTag
+    : !forTag
     ? PAGINATION.LIMIT
     : PAGINATION.TAG_LIMIT;
   const skip: number = page ? (page - 1) * limit : 0;
