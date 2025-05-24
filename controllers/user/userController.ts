@@ -51,11 +51,16 @@ export const userController = {
         const payload = user._id;
         const JWT_SECRET: string | undefined = process.env.JWT_SECRET;
         const token = jwt.sign({ payload }, JWT_SECRET as string, {
-          expiresIn: "1h",
+          expiresIn: "1Day",
         });
+
+        // Decode the token to extract the `exp` field
+        const decoded = jwt.decode(token) as jwt.JwtPayload;
+        const exp = decoded.exp; // UNIX timestamp (in seconds)
 
         return res.status(200).json({
           token,
+          exp, 
         });
       } else {
         return res.status(401).json({
