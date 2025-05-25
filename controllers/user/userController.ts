@@ -3,16 +3,17 @@ import User from "../../models/User";
 import { IUser } from "../../types/user";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import logger from "../../utils/logger";
 
 export const userController = {
   signUpUser: async (req: VercelRequest, res: VercelResponse) => {
     try {
       const user = req.body;
 
-      console.log("Creating user with data:", user);
+      logger.info("Creating user with data:", user);
 
       if (user.role !== "admin") {
-        console.log("Access denied");
+        logger.info("Access denied");
         return res.status(403).json({ message: "Access denied." });
       }
 
@@ -31,11 +32,12 @@ export const userController = {
     try {
       const { email, password } = req.body;
 
-      console.log("Signing in user with email:", email);
+      logger.info("Signing in user with email:", email);
 
       const user: IUser | null = await User.findOne({ email });
 
       if (!user) {
+        logger.info("Invalid email or password");
         return res.status(401).json({
           message: "Invalid email or password",
         });
@@ -60,7 +62,7 @@ export const userController = {
 
         return res.status(200).json({
           token,
-          exp, 
+          exp,
         });
       } else {
         return res.status(401).json({
