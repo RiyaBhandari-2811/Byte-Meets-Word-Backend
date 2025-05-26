@@ -1,7 +1,7 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { IArticleDetail } from "../types/article";
 
-const ArticleSchema: Schema<IArticleDetail> = new Schema(
+const ArticleSchema: Schema<IArticleDetail> = new Schema<IArticleDetail>(
   {
     title: { type: String, required: true },
     subtitle: { type: String },
