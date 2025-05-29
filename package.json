@@ -21,6 +21,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/mongoose": "^5.11.96",
+    "@types/nodemailer": "^6.4.17",
     "@vercel/node": "^5.1.14",
     "typescript": "^5.8.2"
   },
@@ -29,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.14.2",
     "mongoose": "^8.13.1",
+    "nodemailer": "^7.0.3",
     "redis": "^4.7.0",
     "winston": "^3.17.0"
   }
