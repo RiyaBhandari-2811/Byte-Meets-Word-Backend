@@ -61,7 +61,7 @@ const subscribe = async (req: VercelRequest, res: VercelResponse) => {
       { upsert: true, new: true }
     );
 
-    const link = `${process.env.BASE_URL}/api/verify?token=${verifyToken}`;
+    const link = `${process.env.BASE_URL}/api/newsletter/verify?token=${verifyToken}`;
     const html = `<p>Click <a href="${link}">here</a> to verify your email. Expires in 10 minutes.</p>`;
 
     await sendEmail(email, "Verify your subscription", html);
