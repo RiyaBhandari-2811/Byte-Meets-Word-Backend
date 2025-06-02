@@ -18,7 +18,7 @@ const send = async (req: VercelRequest, res: VercelResponse) => {
     return res.json({ message: "No verified subscribers found" });
 
   const sendPromises = subscribers.map((sub) => {
-    const unsubLink = `${process.env.BASE_URL}/api/unsubscribe?token=${sub.unsubToken}`;
+    const unsubLink = `${process.env.BASE_URL}/api/newsletter/unsubscribe?token=${sub.unsubToken}`;
     const html = `
       <div>
         ${content}
