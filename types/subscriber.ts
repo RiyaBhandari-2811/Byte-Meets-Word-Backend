@@ -1,8 +1,8 @@
 export interface ISubscriber {
   email: string;
   verified: boolean;
-  verifyToken?: string;
-  verifyTokenExpiry?: Date;
+  verifyToken?: string | null;
+  verifyTokenExpiry?: Date | null;
   unsubToken?: string;
   unsubTokenExpiry?: Date;
   createdAt?: Date;
