@@ -32,15 +32,19 @@ const verifySubscriber = async (
     await user.save();
     logger.info(`Subscriber ${user.email} verified successfully.`);
 
+    const link = `${process.env.BASE_URL}/api/newsletter/unsubscribe?token=${user.unsubToken}`;
     const html = `
-      <html>
-        <head><title>Thank You</title></head>
-        <body>
-          <h1>Thank you for verifying your email!</h1>
-          <p>You are now subscribed to our newsletter.</p>
-        </body>
-      </html>
-    `;
+  <html>
+    <head><title>Thank You</title></head>
+    <body>
+      <h1>Thank you for verifying your email!</h1>
+      <p>You are now subscribed to our newsletter.</p>
+      <p style="margin-top: 30px; font-size: 12px; color: #666;">
+        If you wish to unsubscribe, <a href="${link}" style="color: #666;">click here</a>.
+      </p>
+    </body>
+  </html>
+`;
 
     return res.setHeader("Content-Type", "text/html").status(200).send(html);
   } catch (error: any) {
