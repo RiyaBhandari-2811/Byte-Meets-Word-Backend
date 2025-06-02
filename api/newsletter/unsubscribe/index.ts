@@ -14,7 +14,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { token } = query;
 
   switch (method) {
-    case "GET":
+    case "DELETE":
       logger.debug("Handling GET request for unsubscribe.");
 
       if (!token || typeof token !== "string") {
