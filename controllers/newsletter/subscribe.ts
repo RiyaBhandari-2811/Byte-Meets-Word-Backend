@@ -1,28 +1,9 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import logger from "../../utils/logger";
 import connectDB from "../../utils/mongodb";
-import nodemailer from "nodemailer";
 import Subscriber from "../../models/Subscriber";
 import crypto from "crypto";
-
-const transport = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT),
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
-const sendEmail = (to: string, subject: string, html: string) => {
-  logger.debug(`Sending email to ${to} with subject: ${subject}`);
-  return transport.sendMail({
-    from: process.env.EMAIL_FROM,
-    to,
-    subject,
-    html,
-  });
-};
+import sendEmail from "../../utils/sendEmail";
 
 const subscribe = async (req: VercelRequest, res: VercelResponse) => {
   try {
