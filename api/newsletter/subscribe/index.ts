@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-import subscribe from "../../../controllers/newsletter/subscribe"
-import logger from "../../../utils/logger"
+import subscribe from "../../../controllers/newsletter/subscribe";
+import logger from "../../../utils/logger";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query, url } = req;
@@ -16,6 +16,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       logger.debug("Routing to subscribe handler.");
       await subscribe(req, res);
       break;
+    case "OPTIONS":
+      return res.status(200).end();
     default:
       logger.debug(`Unsupported HTTP method: ${method}`);
       res.setHeader("Allow", ["POST", "GET", "PATCH", "DELETE"]);
