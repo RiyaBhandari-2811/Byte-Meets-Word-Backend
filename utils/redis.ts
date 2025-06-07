@@ -19,6 +19,7 @@ export async function getRedisClient(): Promise<RedisClientType> {
       logger.debug("Successfully connected to Redis");
     } catch (error) {
       logger.error("Failed to connect to Redis", { error });
+      throw new Error("Redis connection failed");
     }
   } else {
     logger.debug("Using existing Redis connection");
