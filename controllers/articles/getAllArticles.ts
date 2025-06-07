@@ -5,7 +5,7 @@ import { getPagination } from "../../utils/getPagination";
 import connectDB from "../../utils/mongodb";
 import { IGetArticlesResponse } from "../../types/article";
 import logger from "../../utils/logger";
-import { getDataWithCache } from "../../utils/cacheUtils";
+import { getDataWithCache } from "../../utils/cacheUtil";
 
 const getAllArticles = async (req: VercelRequest, res: VercelResponse) => {
   try {

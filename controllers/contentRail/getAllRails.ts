@@ -3,7 +3,7 @@ import { CACHE_KEYS, TTL } from "../../constants/redisConstants";
 import connectDB from "../../utils/mongodb";
 import logger from "../../utils/logger";
 import Category from "../../models/Category";
-import { getDataWithCache } from "../../utils/cacheUtils";
+import { getDataWithCache } from "../../utils/cacheUtil";
 
 const getAllRails = async (req: VercelRequest, res: VercelResponse) => {
   try {
