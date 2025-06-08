@@ -10,13 +10,11 @@ const getArticlesByTagId = async (
   try {
     logger.info("Feching articles by category...");
 
-    const response = await fetchArticlesByTagOrCategory({
+    return await fetchArticlesByTagOrCategory({
       tagId,
       req,
       res,
     });
-
-    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({
       message: "Failed to fetch articles",

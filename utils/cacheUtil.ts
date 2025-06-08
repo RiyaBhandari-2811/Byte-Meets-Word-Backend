@@ -18,8 +18,8 @@ export async function getDataWithCache<T>(
   // First check if Redis is available
   try {
     redis = await getRedisClient();
-  } catch (redisConnectionError) {
-    logger.error("Failed to connect to Redis, falling back to data source", { error: redisConnectionError });
+  } catch (error) {
+    logger.error("Failed to connect to Redis, falling back to data source", { error });
     // If Redis is down, immediately fetch from data source
     return await dataFetcher();
   }
