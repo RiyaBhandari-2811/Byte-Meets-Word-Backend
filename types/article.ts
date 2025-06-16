@@ -1,3 +1,6 @@
+import { ICategory } from "./categories";
+import { ITag } from "./tag";
+
 export interface IArticle {
   _id: string;
   title: string;
@@ -15,8 +18,8 @@ export interface IArticleDetail {
   featureImage: string;
   mainContent: string;
   readTime: number;
-  category: string | null;
-  tags: string[];
+  category: ICategory | null;
+  tags: ITag[];
   isActive: boolean;
   createdAt: Date;
   modifiedAt: Date;

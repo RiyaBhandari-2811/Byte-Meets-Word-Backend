@@ -1,7 +1,24 @@
 import mongoose, { Schema, Model } from "mongoose";
 import { IArticleDetail } from "../types/article";
 
-const ArticleSchema: Schema<IArticleDetail> = new Schema<IArticleDetail>(
+const CategorySchema = new Schema(
+  {
+    _id: { type: Schema.Types.ObjectId, required: true },
+    name: { type: String, required: true },
+    showOnHome: { type: Boolean, required: true },
+  },
+  { _id: false }
+);
+
+const TagSchema = new Schema(
+  {
+    _id: { type: Schema.Types.ObjectId, required: true },
+    name: { type: String, required: true },
+  },
+  { _id: false }
+);
+
+const ArticleSchema: Schema<IArticleDetail> = new Schema(
   {
     title: { type: String, required: true },
     subtitle: { type: String },
@@ -9,8 +26,10 @@ const ArticleSchema: Schema<IArticleDetail> = new Schema<IArticleDetail>(
     featureImage: { type: String, required: true },
     mainContent: { type: String, required: true },
     readTime: { type: Number, required: true },
-    category: { type: Schema.Types.ObjectId, ref: "Category", default: null },
-    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
+
+    category: { type: CategorySchema, required: true },
+    tags: { type: [TagSchema], required: true },
+
     isActive: { type: Boolean, default: true },
   },
   {
@@ -18,8 +37,8 @@ const ArticleSchema: Schema<IArticleDetail> = new Schema<IArticleDetail>(
   }
 );
 
-const Article: Model<IArticleDetail> = mongoose.model<IArticleDetail>(
-  "Article",
-  ArticleSchema
-);
+const Article: Model<IArticleDetail> =
+  mongoose.models.Article ||
+  mongoose.model<IArticleDetail>("Article", ArticleSchema);
+
 export default Article;
