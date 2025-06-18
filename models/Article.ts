@@ -27,7 +27,7 @@ const ArticleSchema: Schema<IArticleDetail> = new Schema(
     mainContent: { type: String, required: true },
     readTime: { type: Number, required: true },
 
-    category: { type: CategorySchema, required: true },
+    category: { type: CategorySchema },
     tags: { type: [TagSchema], required: true },
 
     isActive: { type: Boolean, default: true },
