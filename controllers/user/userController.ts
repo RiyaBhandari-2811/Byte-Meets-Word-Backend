@@ -8,9 +8,9 @@ import logger from "../../utils/logger";
 export const userController = {
   signUpUser: async (req: VercelRequest, res: VercelResponse) => {
     try {
-      const user = req.body;
+      const user: IUser = req.body;
 
-      logger.info("Creating user with data:", user);
+      logger.info(`Creating user with data: ${user}`);
 
       if (user.role !== "admin") {
         logger.info("Access denied");
