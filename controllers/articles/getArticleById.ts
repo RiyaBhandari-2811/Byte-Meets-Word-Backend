@@ -19,7 +19,7 @@ const getArticleById = async (
       await connectDB();
       logger.debug("Connected to MongoDB - querying articles by id collection");
 
-      const article = await Article.findById(articleId).populate("tags", "name");
+      const article = await Article.findById(articleId);
 
       if (!article) {
         logger.error(`Article not found in DB. ID: ${articleId}`);
