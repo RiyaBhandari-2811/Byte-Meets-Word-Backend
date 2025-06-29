@@ -25,39 +25,6 @@ const updatedArticleById = async (
     await connectDB();
     logger.debug("Successfully connected to MongoDB.");
 
-    if (updateData.category) {
-      logger.debug(`Resolving category name: ${updateData.Category}`);
-      const categoryDoc = await Category.findOne({
-        name: updateData.category as string,
-      });
-      if (!categoryDoc) {
-        logger.debug(`Invalid Category name: ${updateData.category}`);
-        return res.status(400).json({ message: "Invalid Category name" });
-      }
-      updateData.category = categoryDoc._id;
-      logger.debug(`Resolved Category ID: ${categoryDoc._id}`);
-    }
-
-    if (updateData.tags && Array.isArray(updateData.tags)) {
-      logger.debug("Resolving tag names to IDs");
-      try {
-        updateData.tags = await getTagIdsByNames(updateData.tags as string[]);
-        logger.debug("Resolved tag IDs", { tagIds: updateData.tags });
-      } catch (err) {
-        const message = (err as Error).message;
-        if (message.startsWith("TagNotFound:")) {
-          const missingTag = message.split(":")[1];
-          logger.debug(`Tag not found: ${missingTag}`);
-          return res.status(400).json({
-            message: "Tag not found",
-            tag: missingTag,
-          });
-        }
-        logger.error("Error resolving tag names", { error: err });
-        throw err;
-      }
-    }
-
     logger.debug("Updating article in database...");
     const updatedArticle = await Article.findByIdAndUpdate(id, updateData, {
       new: true,
