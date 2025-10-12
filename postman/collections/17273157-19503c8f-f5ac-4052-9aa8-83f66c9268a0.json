@@ -1,0 +1,882 @@
+{
+	"info": {
+		"_postman_id": "17273157-19503c8f-f5ac-4052-9aa8-83f66c9268a0",
+		"name": "byte-meets-word",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Tags",
+			"item": [
+				{
+					"name": "Create Tag [Single & Bulk]",
+					"id": "17273157-a8b4e44d-898f-4301-a61d-59a6eb7905a6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"tagsName\": [\"jwtttt\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}tags",
+							"host": [
+								"{{baseURL}}tags"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Tags",
+					"id": "17273157-766b45b9-2c04-45de-a003-1be32966cc1f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}tags?page=1",
+							"host": [
+								"{{baseURL}}tags"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Tag By Id",
+					"id": "17273157-79342dec-3981-4e50-b9ec-d963a106a474",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"next.js\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}tags?tagId=67ef9c434bb17443f908a2a8",
+							"host": [
+								"{{baseURL}}tags"
+							],
+							"query": [
+								{
+									"key": "tagId",
+									"value": "67ef9c434bb17443f908a2a8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Tag By Id",
+					"id": "17273157-6b21859a-95b3-4c7b-a93e-58c3b9db09ff",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}tags?tagId=67ef9c434bb17443f908a2a8",
+							"host": [
+								"{{baseURL}}tags"
+							],
+							"query": [
+								{
+									"key": "tagId",
+									"value": "67ef9c434bb17443f908a2a8"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "17273157-61d8edc9-7d3d-4f7f-b49d-483abf5afc60"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Create Category [Single & Bulk]",
+					"id": "17273157-3b608b39-e638-40c4-ab54-1ff1bc5fed0b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\r\n   \r\n    {\r\n        \"name\": \"Tech & AI\",\r\n        \"showOnHome\": true\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}categories",
+							"host": [
+								"{{baseURL}}categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Categories",
+					"id": "17273157-a6a762f1-9f98-4b6f-8ad0-b9c39672d49c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}categories?page=1",
+							"host": [
+								"{{baseURL}}categories"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category By Id",
+					"id": "17273157-0b367710-a25e-4899-97f6-834c791c5873",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"showOnHome\": true,\r\n    \"name\": \"Tech & Innovation\",\r\n    \"isActive\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}categories/67f15ad6267d34f0841f94ac",
+							"host": [
+								"{{baseURL}}categories"
+							],
+							"path": [
+								"67f15ad6267d34f0841f94ac"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category By Id",
+					"id": "17273157-7af1e862-c3c4-46d3-a225-215ac0be1191",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}categories/67ecb3dbb1b7afb97b70f50c",
+							"host": [
+								"{{baseURL}}categories"
+							],
+							"path": [
+								"67ecb3dbb1b7afb97b70f50c"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "17273157-0a602c7c-6475-42ba-9b08-60def4bf7cfd"
+		},
+		{
+			"name": "Articles",
+			"item": [
+				{
+					"name": "Create Article",
+					"id": "17273157-eb5e7cd4-5123-436b-a1d9-5d2b9952c004",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Consequatur . 13\",\r\n  \"subtitle\": \"Exploring breakthroughs and innovations in the tech world.\",\r\n  \"description\": \"Molestiae ut est dolorem a vero et in. Dignissimos id et dolore consequuntur explicabo doloremque soluta. Deserunt repudiandae soluta nulla neque aut recusandae sed non. Itaque velit neque dicta dolores fuga dicta sunt.\",\r\n  \"featureImage\": \"https://images.unsplash.com/photo-1463936575829-25148e1db1b8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w0OTE2MTF8MHwxfHNlYXJjaHwxMHx8UGxhbnRzfGVufDB8MHx8fDE2OTczNTc1NjV8MA&ixlib=rb-4.0.3&q=85\",\r\n  \"mainContent\": \"<h1 style='text-align: center'>Hello</h1><p style='text-align: left'>Welcome to my blog. My name is <em>Riya</em>. I like to <em><u>code</u></em>, <mark>what about you? </mark> Nostra fusce sit nullam eget pharetra magna curabitur et. Duis hendrerit integer lacinia augue condimentum. Aenean tincidunt proin feugiat dui tristique. Arcu primis felis magna mollis sapien class parturient. Habitant maximus ultricies accumsan faucibus proin pulvinar nisi gravida mattis massa. Eleifend maecenas sagittis litora arcu praesent fames pellentesque phasellus. Purus senectus luctus eget si diam potenti fermentum consectetuer.</p><p>Eleifend luctus vulputate commodo si ultrices dapibus placerat lectus. Fames <sub>etiam </sub>ad convallis pellentesque curae cras mauris nam malesuada. Gravida rutrum sit non diam vitae aptent velit posuere odio. Mi viverra rhoncus aptent laoreet malesuada lorem donec massa lacus.<span style='color: #cc2e2e'> Laoreet eros penatibus vestibulum ridiculus blandit odio</span>. Class imperdiet placerat urna blandit <sup>tempus </sup>finibus facilisi hac molestie.</p><p></p><ol><li><p>Tortor curae eros dignissim diam</p></li><li><p>Tortor curae eros dignissim diam</p></li><li><p>Tortor curae eros dignissim diam</p></li></ol><hr><p style='text-align: left'><img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR132TBAD0-GhGhN8_2Xr-3obkFd4NzFbk6Hg&amp;s'></p><p></p><ul><li><p>Tortor curae eros dignissim diam</p></li><li><p>Tortor curae eros dignissim diam</p></li><li><p>Tortor curae eros dignissim diam</p></li></ul>\",\r\n  \"readTime\": 160,\r\n  \"category\": \"Tech & Innovation\",\r\n  \"tags\": [\"Swift\", \"Python\"],\r\n  \"isActive\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}articles",
+							"host": [
+								"{{baseURL}}articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Articles",
+					"id": "17273157-077bf2a3-a855-470a-b856-4a207c0a40d2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}articles",
+							"host": [
+								"{{baseURL}}articles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Article",
+					"id": "17273157-3f4052c5-5033-453e-83f9-c67b95d888ed",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"isActive\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}articles?articleId=6814c2d5ae54d3e1b1cb2aa7",
+							"host": [
+								"{{baseURL}}articles"
+							],
+							"query": [
+								{
+									"key": "articleId",
+									"value": "6814c2d5ae54d3e1b1cb2aa7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Article",
+					"id": "17273157-fc8d4802-df2e-43f4-b6a8-11277246758e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseURL}}articles?articleId=6814c2d5ae54d3e1b1cb2aa7",
+							"host": [
+								"{{baseURL}}articles"
+							],
+							"query": [
+								{
+									"key": "articleId",
+									"value": "6814c2d5ae54d3e1b1cb2aa7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Article By ID",
+					"id": "17273157-05772135-164b-48ff-925b-2f4ec79ef66d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}articles?articleId=6852d224fd07d83e92bbdb3f",
+							"host": [
+								"{{baseURL}}articles"
+							],
+							"query": [
+								{
+									"key": "articleId",
+									"value": "6852d224fd07d83e92bbdb3f"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Articles By Category",
+					"id": "17273157-bbf66b29-be8b-4d9d-a771-8c6630a5dc40",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}articles?categoryId=67f15ad6267d34f0841f94a9&page=1",
+							"host": [
+								"{{baseURL}}articles"
+							],
+							"query": [
+								{
+									"key": "categoryId",
+									"value": "67f15ad6267d34f0841f94a9"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Articles By Tag",
+					"id": "17273157-47599673-2aac-41a1-ada9-d374febf14c3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}articles?page=1&tagId=67ef9c444bb17443f908a2bd",
+							"host": [
+								"{{baseURL}}articles"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "tagId",
+									"value": "67ef9c444bb17443f908a2bd"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "17273157-35a5f203-39e2-4c73-b9c0-5c10d4cd4770"
+		},
+		{
+			"name": "Content Rail",
+			"item": [
+				{
+					"name": "Get all Content Rail",
+					"id": "17273157-c2aa8430-a9e1-4550-9aa4-6fd735f9a71f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/contentRail",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"contentRail"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "17273157-23bef792-3104-4e4a-8518-46848c27b217"
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Sign up",
+					"id": "17273157-1e0e39c4-2dbd-4058-a743-08138df2cc1f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Alice Johnson\",\r\n    \"email\": \"aliceee.johnson@example.com\",\r\n    \"password\": \"StrongPass123\",\r\n    \"role\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/signUp",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"signUp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign In",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "43d6b2e4-cff8-41f3-b5bd-cf0818855a95",
+								"exec": [
+									"// Parse the response body\r",
+									"const responseBody = pm.response.json();\r",
+									"\r",
+									"// Check if the response body contains the token\r",
+									"if (responseBody.hasOwnProperty('token')) {\r",
+									"    // Extract the token from the response body\r",
+									"    const authToken = responseBody.token;\r",
+									"\r",
+									"    // Save the token in an environment variable for later use\r",
+									"    pm.environment.set('authToken', authToken);\r",
+									"} else {\r",
+									"    console.log('Token not found in the response body');\r",
+									"}\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "17273157-a78225c7-3f50-49f0-b1b3-02157fc42195",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"riya2@gmail.com\",\r\n    \"password\": \"Riya1234$\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/user/signIn",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"user",
+								"signIn"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "17273157-8b38c037-65cf-4f63-8055-9f6c7be9017a"
+		},
+		{
+			"name": "Course",
+			"item": [
+				{
+					"name": "Create Course",
+					"id": "17273157-23ec90b7-4950-4068-9777-b27b83ab4ebd",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"title\": \"Kotlin for Android Development\",\r\n      \"featureImage\": \"https://img.youtube.com/vi/F9UC9DY-vIU/maxresdefault.jpg\",\r\n      \"description\": \"Learn Kotlin and build Android applications.\",\r\n      \"duration\": \"1:45:55\",\r\n      \"youtubeLink\": \"https://www.youtube.com/watch?v=F9UC9DY-vIU\"\r\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}course",
+							"host": [
+								"{{baseURL}}course"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Courses",
+					"id": "17273157-6266f9e0-8b06-4ce6-8151-88c5ec999741",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}course?page=1",
+							"host": [
+								"{{baseURL}}course"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course",
+					"id": "17273157-1a79f26b-bcca-4e89-a8c8-0907fd6c34f7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Kotlin for Android Development - EDIT\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}course/67fdd31f64fd02f0f72d98df",
+							"host": [
+								"{{baseURL}}course"
+							],
+							"path": [
+								"67fdd31f64fd02f0f72d98df"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Course By Id",
+					"id": "17273157-485ebf8f-ed5d-48ee-ad2a-f4dc03161276",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}course/67fdd31f64fd02f0f72d98df",
+							"host": [
+								"{{baseURL}}course"
+							],
+							"path": [
+								"67fdd31f64fd02f0f72d98df"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "17273157-9b9d9bf1-f944-4f4f-87b6-85ce64b6e051"
+		},
+		{
+			"name": "Newsletter",
+			"item": [
+				{
+					"name": "Subscribe",
+					"id": "17273157-4886bbd6-1cdd-4855-9e67-7a77111df3a1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"allriyanotes@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://byte-meets-word-backend.vercel.app/api/newsletter/subscribe",
+							"protocol": "https",
+							"host": [
+								"byte-meets-word-backend",
+								"vercel",
+								"app"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"subscribe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify",
+					"id": "17273157-d3f8e8d8-6f6e-4dfd-a2d6-31bc10e93256",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"bhandari28riya@gmail.com\"\r\n}"
+						},
+						"url": {
+							"raw": "{{prodBaseURL}}newsletter/verify?token=2e9b779f88713f595e6f5a8184c7ee08695ebb9baa62ddb5871ab2569918a16e",
+							"host": [
+								"{{prodBaseURL}}newsletter"
+							],
+							"path": [
+								"verify"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "2e9b779f88713f595e6f5a8184c7ee08695ebb9baa62ddb5871ab2569918a16e"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unsubscribe",
+					"id": "17273157-88a553e4-a252-41a4-8d9c-dd6a2a5f615d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{prodBaseURL}}newsletter/unsubscribe?token=2e9b779f88713f595e6f5a8184c7ee08695ebb9baa62ddb5871ab2569918a16e",
+							"host": [
+								"{{prodBaseURL}}newsletter"
+							],
+							"path": [
+								"unsubscribe"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "2e9b779f88713f595e6f5a8184c7ee08695ebb9baa62ddb5871ab2569918a16e"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send",
+					"id": "17273157-a255d69e-8d15-4883-b373-11082d7a2c69",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"subject\": \"test 2\",\r\n    \"content\": \"<h1> Hello this is bulk email test</h1>\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://byte-meets-word-backend.vercel.app/api/newsletter/send",
+							"protocol": "https",
+							"host": [
+								"byte-meets-word-backend",
+								"vercel",
+								"app"
+							],
+							"path": [
+								"api",
+								"newsletter",
+								"send"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "17273157-69516206-6214-42f0-a04c-fbc9614c0675"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "ee177097-7c7e-4956-a29d-be9c64a103b2",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"// Get isProd value from environment\r",
+					"let isProd = pm.environment.get(\"isProd\");\r",
+					"\r",
+					"console.log(\"isProd: \", isProd);\r",
+					"\r",
+					"// Set baseURL dynamically\r",
+					"if (isProd === \"true\") {\r",
+					"    pm.environment.set(\"baseURL\", pm.environment.get(\"prodBaseURL\"));\r",
+					"} else {\r",
+					"    pm.environment.set(\"baseURL\", pm.environment.get(\"localBaseURL\"));\r",
+					"}\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "9c1f6555-429e-48fb-ba3d-7cca2fc84c3b",
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
