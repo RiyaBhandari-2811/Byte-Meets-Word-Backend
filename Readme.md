@@ -1,4 +1,3 @@
-
 ## 🧭 Getting Started (Run the Project End-to-End Locally)
 
 Welcome to the repository! Follow the steps below to set up and run the project  **end-to-end on your local machine** .
@@ -80,7 +79,17 @@ PORT=3000
 
 ---
 
-### **7. Run the Project**
+### **7. Postman Collection**
+
+You can import the Postman collection to test all API endpoints:
+
+`postman/collections/17273157-19503c8f-f5ac-4052-9aa8-83f66c9268a0.json`
+
+> 💡 **Tip:** Import this file into Postman via  **File → Import → Upload Files** .
+
+---
+
+### **8. Run the Project**
 
 Start the local development server using Vercel CLI:
 
